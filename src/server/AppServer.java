@@ -4,27 +4,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.websocket.Session;
 
 import game.Player;
 import ws.ClientWebSocket;
+import ws.IClientWebSocket;
 
 @Named("AppServer")
 public class AppServer implements IAppServer {
 
 	private static final String CMD_SEP = "#";
 
-	private final ClientWebSocket clientWs;
+	@Inject
+	private IClientWebSocket clientWs;
+	
 	private final GameServer gameServer;
-//	private final PlayersEndpoint playerEndpoint;
 
 	private static ConcurrentHashMap<Session, Player> sessionPlayers = new ConcurrentHashMap<>();
 
 	public AppServer() {
-		this.clientWs = new ClientWebSocket(this);
 		this.gameServer = new GameServer(this);
-//		this.playerEndpoint = new PlayersEndpoint(this);
 	}
 
 	public void removePlayerBySession(Session session) {

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Server health</title>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="js/main.js"></script>
+</head>
+<body>
+	<h1>Hangman Server</h1>
+	<h2>
+		<span id="health"></span>
+	</h2>
+
+	<script>
+		var timerCounterFrom = 10;
+		var timerCounter = timerCounterFrom;
+
+		function refresh() {
+			console.log("refresh");
+			$.ajax({
+				type : "GET",
+				url : "http://localhost:8080/HangmanServer/control/health",
+				success : function(data) {
+					$("#health").html(data)
+				}
+			})
+		}
+
+		function displayHealth() {
+			console.log("displayHealth: " + timerCounter);
+			timerCounter--;
+
+			if (timerCounter <= 0) {
+				timerCounter = 10;
+				refresHealthSection();
+			}
+		}
+
+		function timeout() {
+			setTimeout(function() {
+				showProgress()
+				timeToRefresh()
+				timeout();
+			}, 1000);
+		}
+	</script>
+
+</body>
+</html>

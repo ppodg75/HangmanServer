@@ -3,6 +3,7 @@ package server;
 import static java.util.Optional.of;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -152,7 +153,8 @@ public class GameServer {
 	
 	
 	public List<Player> getPlayers() {
-		return players;
+//		return players;
+		return Arrays.asList( new Player("XXX"), new Player("YYY"));
 	}
 	
 

@@ -1,9 +1,10 @@
 package ws;
 
 import java.io.IOException;
-import java.util.Random;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -11,27 +12,27 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import com.sun.security.ntlm.Client;
+import server.IAppServer;
 
-import server.AppServer;
-
+@ApplicationScoped
 @ServerEndpoint("/play")
-public class ClientWebSocket {
-	
-	private AppServer server;
+public class ClientWebSocket implements IClientWebSocket {
+
+	@Inject
+	private IAppServer server;
+
+	public ClientWebSocket() {
+		System.out.println("cws created");
+	}
 
 	private static ConcurrentLinkedQueue<Session> peers = new ConcurrentLinkedQueue<>();
-	
-	public ClientWebSocket(AppServer server) {
-		this.server = server;
-	}
 
 	@OnOpen
 	public void onOpen(Session session) {
 		System.out.println("onOpen::" + session.getId());
 		peers.add(session);
 	}
-	
+
 	@OnClose
 	public void onClose(Session session) {
 		System.out.println("onClose::" + session.getId());
@@ -41,7 +42,13 @@ public class ClientWebSocket {
 
 	@OnMessage
 	public void onMessage(String message, Session session) {
-         server.messageReceived(session, message);
+		System.out.println("on message:" + message);
+		if (server == null) {
+			System.out.println("Server is NULL");
+		} else {
+			System.out.println("Forwarding message to app server");
+			server.messageReceived(session, message);
+		}
 	}
 
 	@OnError
@@ -56,9 +63,11 @@ public class ClientWebSocket {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void sendToAll(String msg) {
-		peers.forEach( session -> { send(session,msg); });
+		peers.forEach(session -> {
+			send(session, msg);
+		});
 	}
 
 }
