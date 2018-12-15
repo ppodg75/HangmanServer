@@ -7,20 +7,20 @@
 <script src="js/main.js"></script>
 </head>
 <body>
-	<h1>Hangman Server</h1>
+	<h1>Hangman Server</h1>	
 	<h2>
 		<span id="health"></span>
 	</h2>
-
+	<h3>refresh every 10 seconds</h3>
 	<script>
 		var timerCounterFrom = 10;
 		var timerCounter = timerCounterFrom;
 
-		function refresh() {
+		function refresHealthSection() {
 			console.log("refresh");
 			$.ajax({
 				type : "GET",
-				url : "http://localhost:8080/HangmanServer/control/health",
+				url : "http://localhost:8080/HangmanServer/ep/control/health",
 				success : function(data) {
 					$("#health").html(data)
 				}
@@ -39,11 +39,12 @@
 
 		function timeout() {
 			setTimeout(function() {
-				showProgress()
-				timeToRefresh()
+				displayHealth()
 				timeout();
 			}, 1000);
 		}
+		refresHealthSection()
+		timeout()
 	</script>
 
 </body>

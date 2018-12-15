@@ -1,17 +1,18 @@
 package game;
 
-import javax.websocket.Session;
-
 public class Player {
 	
+	private String UID;
 	private String name;
 	private long points = 0;
 	private long countWins = 0;
 	private long countLosts = 0;	
 	private PlayerStatus status = PlayerStatus.CREATED;
 
-	public Player(String name) {
+	public Player(String name, String UID) {
+      System.out.println("Player '"+name+"' created");
       this.name = name;    
+      this.UID = UID;
 	}
 	
 	public long addPoints(long countUniqueLetters) {
@@ -27,6 +28,10 @@ public class Player {
 		return ++countLosts;
 	}
 
+	public String getUID() {
+		return UID;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -55,5 +60,8 @@ public class Player {
 		this.status = status;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "Player: UID="+UID+", Name="+name;
+	}
 }

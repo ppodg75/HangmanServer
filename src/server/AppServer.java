@@ -2,17 +2,19 @@ package server;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.websocket.Session;
 
 import game.Player;
-import ws.ClientWebSocket;
 import ws.IClientWebSocket;
 
 @Named("AppServer")
+@ApplicationScoped
 public class AppServer implements IAppServer {
 
 	private static final String CMD_SEP = "#";
@@ -20,27 +22,28 @@ public class AppServer implements IAppServer {
 	@Inject
 	private IClientWebSocket clientWs;
 	
-	private final GameServer gameServer;
+	@Inject
+	private IGameServer gameServer;
 
 	private static ConcurrentHashMap<Session, Player> sessionPlayers = new ConcurrentHashMap<>();
 
-	public AppServer() {
-		this.gameServer = new GameServer(this);
-	}
-
+	
 	public void removePlayerBySession(Session session) {
 		Player player = sessionPlayers.get(session);
 		gameServer.playerDisconnected(player);
 	}
 
-	public void initPlayer(Session session) {
-		Player player = gameServer.createPlayer();
+	public void initPlayer(Session session, String UID) {
+		Player player = gameServer.createPlayer("", UID);
 		sessionPlayers.put(session, player);
 	}
 
-	public void newPlayer(Session session, String name) {
-		Player player = sessionPlayers.get(session);
-		player.setName(name);
+	public void updatePlayer(String UID, String name) {
+		Player player = gameServer.findPlayerByUID(UID);
+		if (player != null) { 
+			player.setName(name);
+			sendCommandRefershPlayerListToAll();
+		}
 	}
 	
 	private boolean verifyOperation(String op) {
@@ -67,23 +70,10 @@ public class AppServer implements IAppServer {
 	}
 	
 	private void doCommand(Player player, Command cmd, String data) {
-		switch (cmd) {
-		case CMD_INVITIAION : invitationReceived(player, data); break;
-		case CMD_HELLO      : helloReceived(player, data); break;
-		}
-	}
-	
-	private void invitationReceived(Player invitator, String invitatedName) {
-		Player invitated = gameServer.findPlayerByName(invitatedName);
-		gameServer.makeInvitation(invitator, invitated);
-	}
-	
-	private void helloReceived(Player player, String name) {		
-		if (!name.isEmpty()) {
-			gameServer.setPlayerName(player, name);
-			sendCommandRefershPlayerListToAll();
-		}
-	}
+//		switch (cmd) {
+//				
+//		}
+	}	
 
 	public void sendMessageToClient(Player player, String operation, String data) {
 		clientWs.send(getSession(player), operation + CMD_SEP + data);
@@ -91,10 +81,6 @@ public class AppServer implements IAppServer {
 
 	public void sendMessage(Player toPlayer, String message) {
 		sendMessageToClient(toPlayer, Command.CMD_MESSAGE.toString(), message);
-	}
-
-	public void sendInvitation(Player toPlayer, String message) {
-		sendMessageToClient(toPlayer, Command.CMD_INVITIAION.toString(), message);
 	}
 
 	public void sendLetter(Player toPlayer, String letter) {
@@ -115,7 +101,7 @@ public class AppServer implements IAppServer {
 	} 
 	
 	public void sendCommandRefershPlayerListToAll() {
-        clientWs.sendToAll(Command.CMD_REFERSH_PLAYERS.toString());		
+//        clientWs.sendToAll(Command.CMD_REFERSH_PLAYERS.toString());		
 	}
 	
 	public List<Player> getPlayers() {
@@ -125,6 +111,12 @@ public class AppServer implements IAppServer {
 	public String getName() {
 		return "Server name";
 	}
+
+	public Player findUserByName(String user) {
+		return gameServer.findPlayerByName(user);
+	}
 	
-	
+	public Player findUserByUID(String UID) {
+		return gameServer.findPlayerByUID(UID);
+	}
 }
