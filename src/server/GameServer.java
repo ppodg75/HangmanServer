@@ -102,8 +102,11 @@ public class GameServer implements IGameServer {
 	}
 
 	
-	public List<Player> getPlayers() {
-		return Arrays.asList( createInvisiblePlayer("test1"), createInvisiblePlayer("test2"));
+	public List<Player> getPlayers() {		
+		List<Player> pl = new ArrayList<>();
+		pl.addAll(Arrays.asList( createInvisiblePlayer("test1"), createInvisiblePlayer("test2")));				
+		pl.addAll(players);
+		return pl;
 	}
 	
 	private Player createInvisiblePlayer(String name) {
