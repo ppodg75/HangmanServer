@@ -2,8 +2,7 @@ package server;
 
 public enum Command {
 	
-	CMD_HELLO("hello")
-	, CMD_INVITIAION("invitation")
+	CMD_HELLO("hello")	
 	, CMD_LETTER("letter")
 	, CMD_ENDGAME("end")
 	, CMD_MESSAGE("msg")

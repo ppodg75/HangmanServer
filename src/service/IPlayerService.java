@@ -6,7 +6,11 @@ import dto.PlayerDto;
 
 public interface IPlayerService {
 	
-	List<PlayerDto> getPlayersDto(); 
+	List<PlayerDto> getPlayersDto();
+	
+	PlayerDto getPlayer(String userName);
+	
+	PlayerDto createPlayer(String userName);
 	
 	String test();
 

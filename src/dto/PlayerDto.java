@@ -4,23 +4,27 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import game.PlayerStatus;
+
 @XmlRootElement
 public class PlayerDto implements Serializable {
 	
 	private static final long serialVersionUID = 7526471155622776147L;
-		
+	
 	private String name;
 	private long points = 0;
 	private long countWins = 0;
 	private long countLosts = 0;
+	private PlayerStatus status;
 	
 	public PlayerDto() { }
 	
-	public PlayerDto(String name, long points, long countWins, long countLosts) { 
+	public PlayerDto(String name, long points, long countWins, long countLosts,  PlayerStatus status) {
 		this.name=name;
 		this.points=points;
 		this.countWins=countWins;
 		this.countLosts=countLosts;
+		this.status = status;
 	}
 	
 	public String getName() {
@@ -48,4 +52,17 @@ public class PlayerDto implements Serializable {
 		this.countLosts = countLosts;
 	}
 
+	public PlayerStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(PlayerStatus status) {
+		this.status = status;
+	}
+
+
+	@Override
+	public String toString() {
+		return "Player: Name="+name;
+	}
 }

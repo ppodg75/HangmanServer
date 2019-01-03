@@ -15,6 +15,7 @@ public class ControlEndpoint {
 	@Path("/health")
 	@Produces({ MediaType.TEXT_PLAIN })
 	public String health() {
+//		System.out.println("ControlEndpoint.health");	
 		return "Server date time: "+getFomratedDateTime(); 
 	}
 	

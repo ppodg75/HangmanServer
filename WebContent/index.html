@@ -4,28 +4,63 @@
 <meta charset="ISO-8859-1">
 <title>Server health</title>
 <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="js/main.js"></script>
 </head>
 <body>
 	<h1>Hangman Server</h1>
 	<h2>
 		<span id="health"></span>
 	</h2>
+	<br />
+	<h1>Player list:</h1>	
+	<h2>
+		<span id="players"></span>
+	</h2>
 
 	<script>
 		var timerCounterFrom = 10;
 		var timerCounter = timerCounterFrom;
 
-		function refresh() {
-			console.log("refresh");
+		function refresHealthSection() {
+			console.log("refresHealthSection");
 			$.ajax({
 				type : "GET",
-				url : "http://localhost:8080/HangmanServer/control/health",
+				url : "http://localhost:8080/HangmanServer/ep/control/health",
 				success : function(data) {
+					console.log("health success!");
 					$("#health").html(data)
 				}
 			})
+		
 		}
+		
+		
+		function showList(list) {
+		  $("#players").html(list)
+		}
+		
+		
+		function addToList(item, u) {		
+			t = "<div>"+item.name+"</div>"			
+		return t;
+   	   }
+		
+		function refresPlayersSection() {
+			console.log("refresPlayersSection");
+			$.ajax({
+				type : "GET",
+				url : "http://localhost:8080/HangmanServer/ep/players",
+				success : function(data) {
+					console.log("get players success!");
+					var list = ""
+						var b = 0
+						jQuery.each(data, function(index, itemData) {
+							list += addToList(itemData, b)							
+							b = 1 - b
+						});
+				showList(list)
+				}
+			})			
+		}		
 
 		function displayHealth() {
 			console.log("displayHealth: " + timerCounter);
@@ -34,16 +69,18 @@
 			if (timerCounter <= 0) {
 				timerCounter = 10;
 				refresHealthSection();
+			//	refresPlayersSection();
 			}
 		}
 
 		function timeout() {
-			setTimeout(function() {
-				showProgress()
-				timeToRefresh()
+			setTimeout(function() {				
+				displayHealth()
 				timeout();
 			}, 1000);
 		}
+		refresHealthSection()
+		timeout()
 	</script>
 
 </body>

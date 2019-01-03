@@ -1,45 +1,79 @@
 package endpoint;
 
 import java.util.List;
+import java.util.Optional;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.google.gson.Gson;
 
 import dto.PlayerDto;
 import service.IPlayerService;
 
+@ApplicationScoped
 @Path("/players")
 public class PlayersEndpoint {
 	
-	@Inject
-	@Named("playerService")
+	@Inject	
 	private IPlayerService playerService;	
+	
+	private Gson gson;
+	
+	public PlayersEndpoint() {
+		gson = new Gson();
+	}	
 	
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	public String getList() {
-		System.out.println("PlayersEndpoint.getList()");
-		Gson gson = new Gson();
+		System.out.println("PlayersEndpoint.getList");		
 		List<PlayerDto> players = playerService.getPlayersDto();
-		players.add(new PlayerDto("Krzysztof",4,5,8));
-		players.add(new PlayerDto("Wojtek",4,5,8));
-		
-		players.add(0, new PlayerDto("test1",5,6,7));
-		players.add(1, new PlayerDto("test2",5,6,7));
-		
-		return gson.toJson(players);
+		players.stream().forEach(p->System.out.println("PlayersEndpoint.getList > "+p));
+		return toJson(players);
 	}
 	
 	@GET
-	@Path("/test")
+	@Path("{userName}")
+	@Produces({ MediaType.TEXT_PLAIN })
+	public Response getPlayer(@PathParam("userName") String userName) {
+		System.out.println("PlayersEndpoint.getPlayer "+userName);
+		return Optional
+				.ofNullable( playerService.getPlayer(userName) )
+							.map(this::toJson)
+							.map( dto -> Response.ok(dto,MediaType.TEXT_PLAIN).build() )
+							.orElse( Response.status(Response.Status.NOT_FOUND).entity("USER NOT EXIST!" ).build() )
+							;
+	}	
+	
+	@POST
+	@Path("{userName}")
+	@Produces({ MediaType.TEXT_PLAIN })
+	public Response createPlayer(@PathParam("userName") String userName) {		
+		System.out.println("PlayersEndpoint.createPlayer "+userName);
+		return Optional
+				.ofNullable( playerService.createPlayer(userName) )
+							.map(this::toJson)
+							.map( dto -> Response.status(Response.Status.CREATED).entity( dto ).build() )
+							.orElse( Response.status(Response.Status.CONFLICT).entity("USER EXIST!" ).build() );
+	}	
+	
+	private String toJson(Object o) {
+		return gson.toJson(o);
+	}
+	
+	@GET
+	@Path("test")
 	@Produces({ MediaType.TEXT_PLAIN })
 	public String test() {
+		System.out.println("PlayersEndpoint.test");
 		return playerService.test();
 	}
 

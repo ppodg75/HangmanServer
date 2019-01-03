@@ -1,7 +1,5 @@
 package game;
 
-import javax.websocket.Session;
-
 public class Player {
 	
 	private String name;
@@ -11,7 +9,9 @@ public class Player {
 	private PlayerStatus status = PlayerStatus.CREATED;
 
 	public Player(String name) {
-      this.name = name;    
+      System.out.println("Player '"+name+"' created");
+      this.name = name;   
+
 	}
 	
 	public long addPoints(long countUniqueLetters) {
@@ -27,6 +27,7 @@ public class Player {
 		return ++countLosts;
 	}
 
+	
 	public String getName() {
 		return name;
 	}
@@ -55,5 +56,8 @@ public class Player {
 		this.status = status;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "Player: Name="+name;
+	}
 }
