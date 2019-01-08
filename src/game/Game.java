@@ -65,8 +65,7 @@ public class Game {
 			theWord = "";
 			gameStatus = GameStatus.WAIT_FOR_WORD;
 		} else {
-			theWord = WordGenerator.getNewWord();
-			gameStatus = GameStatus.PLAY;
+			updateWord( WordGenerator.getNewWord() );
 		}	
 		theWinner = null;
 		getWordPlayer().setStatus(PlayerStatus.PLAYING);
@@ -74,7 +73,9 @@ public class Game {
 	}
 
 	public void updateWord(String theWord) {
+		System.out.println("Server.Game.updateWord: "+theWord);
 		this.theWord = theWord.toUpperCase();	
+		this.gameStatus = GameStatus.PLAY;
 		initCounters();
 	}
 

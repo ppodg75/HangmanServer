@@ -99,7 +99,7 @@ public class PlayerService implements IPlayerService {
 	
 	public GameDto updateWord(String userName, String word) {
 		Player player = gameServer.findPlayerByName(userName); 
-		return of(gameServer.updateGappedWordLetter(player, word));
+		return of(gameServer.updateWord(player, word));
 	}
 	
 	public GameDto getGame(String userName) {

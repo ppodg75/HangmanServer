@@ -80,7 +80,7 @@ public class GameEndpoint {
 							;
 	}	
 	
-	@PUT
+	@GET
 	@Path("updateWord/{userName}/{word}")
 	@Produces({ MediaType.TEXT_PLAIN })
 	public Response setWordAndReturnGame(@PathParam("userName") String userName, @PathParam("word") String word) {

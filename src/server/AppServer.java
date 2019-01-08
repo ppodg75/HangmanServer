@@ -58,7 +58,7 @@ public class AppServer implements IAppServer {
 
 
 	public void sendLetter(Player toPlayer, String letter) {
-		sendMessageToClient(toPlayer, Command.CMD_LETTER.toString(), letter);
+		sendMessageToClient(toPlayer, Command.CMD_LETTER.toString());
 	}
 
 	public void sendMessageOpponentDisconnected(Player toPlayer, String disconnectedPlayerName) {
@@ -71,7 +71,7 @@ public class AppServer implements IAppServer {
 	
 	
 	public void wordUpdated(Player toPlayer) {
-		sendMessageToClient(toPlayer, Command.CMD_WORD_UPDATED.toString(), "");
+		sendMessageToClient(toPlayer, Command.CMD_WORD_UPDATED.toString());
 	}
 
 	public void sendRefreshListPlayersToAll() {
