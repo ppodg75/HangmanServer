@@ -39,7 +39,7 @@ public class PlayerEndpoint {
 	public String getList() {
 		System.out.println("PlayersEndpoint.getList");		
 		List<PlayerDto> players = playerService.getPlayersDto();
-		players.stream().forEach(p->System.out.println("PlayersEndpoint.getList > "+p));
+//		players.stream().forEach(p->System.out.println("PlayersEndpoint.getList > "+p));
 		return toJson(players);
 	}
 	
@@ -55,8 +55,6 @@ public class PlayerEndpoint {
 							.orElse( Response.status(Response.Status.NOT_FOUND).entity("USER NOT EXIST!" ).build() )
 							;
 	}
-	
-	
 	
 	@POST
 	@Path("{userName}")

@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 
 import game.Game;
+import server.IGameServer;
 import service.IPlayerService;
 
 @ApplicationScoped
@@ -22,12 +23,23 @@ import service.IPlayerService;
 public class GameEndpoint {
 	
 	@Inject	
-	private IPlayerService playerService;	
+	private IPlayerService playerService;
+	
+	@Inject
+	private IGameServer gameServer;
+	
 	
 	private Gson gson;
 	
 	public GameEndpoint() {
 		gson = new Gson();
+	}	
+	
+	@GET	
+	@Produces({ MediaType.TEXT_PLAIN })
+	public String getList() {						
+		System.out.println("getList");
+		return toJson(gameServer.getListOfGames());
 	}	
 	
 	@GET
@@ -69,7 +81,7 @@ public class GameEndpoint {
 	}	
 	
 	@PUT
-	@Path("game/{userName}/word/{word}")
+	@Path("updateWord/{userName}/{word}")
 	@Produces({ MediaType.TEXT_PLAIN })
 	public Response setWordAndReturnGame(@PathParam("userName") String userName, @PathParam("word") String word) {
 		System.out.println("PlayersEndpoint.getGame "+userName);		

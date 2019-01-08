@@ -1,27 +1,30 @@
 package dto;
 
 import java.io.Serializable;
+import java.util.Optional;
+
 import static java.util.Optional.ofNullable;
 import game.Game;
 
 public class GameDto implements Serializable {
-	
+
 	private static final long serialVersionUID = 75264711556227767L;
-	
+
 	private String theWord;
-	private String gappedWord;	
+	private String gappedWord;
 	private int countMissed = 0;
-	private String usedLetters;	
+	private String usedLetters;
 	private String gameStatus;
 	private String winner;
 
-	public GameDto(String theWord, String gappedWord, int countMissed, String usedLetters, String gameStatus, String winner) {		
+	public GameDto(String theWord, String gappedWord, int countMissed, String usedLetters, String gameStatus,
+			String winner) {
 		this.theWord = theWord;
 		this.gappedWord = gappedWord;
 		this.countMissed = countMissed;
 		this.usedLetters = usedLetters;
 		this.gameStatus = gameStatus;
-		this.winner = gameStatus;
+		this.winner = winner;
 	}
 
 	public String getTheWord() {
@@ -63,7 +66,7 @@ public class GameDto implements Serializable {
 	public void setGameStatus(String gameStatus) {
 		this.gameStatus = gameStatus;
 	}
-		
+
 	public String getWinner() {
 		return winner;
 	}
@@ -73,16 +76,17 @@ public class GameDto implements Serializable {
 	}
 
 	public static GameDto of(Game game) {
-		return ofNullable(game).map( g ->
-								 new GameDto(g.getTheWord()
-											   ,g.getGappedWord()
-											   ,g.getCountMissed()
-											   ,g.getUsedLetters()
-											   ,g.getGameStatus().name()
-											   ,g.getWinner().getName()
-											   )
-								 ).orElse(null); 
-		
+		if (game != null) {
+			return new GameDto(game.getTheWord()
+					, game.getGappedWord()
+					, game.getCountMissed()
+					, game.getUsedLetters()
+					, game.getGameStatus().name()
+					, game.getWinnerName()
+					);
+		} else
+			return null;
+
 	}
 
 }

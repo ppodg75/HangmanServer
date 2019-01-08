@@ -1,5 +1,7 @@
 package game;
 
+import java.util.Optional;
+
 public class Game {
 	
 	private static final int MAX_MISSED_LETTERS = 8;
@@ -51,6 +53,10 @@ public class Game {
 	
 	public Player getWinner() {
 		return theWinner;
+	}
+	
+	public String getWinnerName() {
+		return Optional.ofNullable(theWinner).orElse( new Player("") ).getName();
 	}
 		
 	public void init(boolean replay) {

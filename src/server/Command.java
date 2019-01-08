@@ -7,6 +7,8 @@ public enum Command {
 	, CMD_DISCONNECTED("disconnected")
 	, CMD_REFERSH_PLAYERS("refresh_player_list")
 	, CMD_WORD_UPDATED("word_updated")
+	, CMD_GOTO_PAGE_GUESS("goto_guess")
+	, CMD_GOTO_PAGE("goto")
 	, CMD_UNKNOWN("");
 	
 	String cmd;

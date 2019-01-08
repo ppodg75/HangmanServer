@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ public class GameServer implements IGameServer {
 
 	public Game createGame(Player player) {
 		System.out.print("GameServer.createGame");
-		Game game = makeGame(Player.createComputerPlayer(), player, false);		
+		Game game = makeGame( player, Player.createComputerPlayer(), false);		
 		return game;
 	}
 
@@ -44,13 +45,15 @@ public class GameServer implements IGameServer {
 	private Game makeGame(Player player, Player opponent, boolean randomRole) {
 		System.out.print("GameServer.makeGame: ");
 		Game game = Optional.ofNullable(findGameByPlayers(player, opponent)).orElseGet(Game::new);
+		String opponentPage = "word";
 		if (game.getGameStatus() == GameStatus.END) {
 			game.init(true);
 		} else {
-			int r = randomRole ? random.nextInt(100) : 100;
-			if (r > 50) {
+			int r = randomRole ? random.nextInt(100) : 0;
+			if (r > 500) { // !!!!!!!!!!!!!!!!!!!!!!!!!!!
 				game.setWordPlayer(player);
 				game.setGuessPlayer(opponent);
+				opponentPage = "guess";
 			} else {
 				game.setWordPlayer(opponent);
 				game.setGuessPlayer(player);
@@ -58,6 +61,8 @@ public class GameServer implements IGameServer {
 			game.init(false);
 		}
 		System.out.print("GameServer.makeGame:game= " + game);
+		games.put(player, game);
+		server.sendGoToPage(opponent, opponentPage);
 		listPlayers();
 		return game;
 	}
@@ -93,19 +98,25 @@ public class GameServer implements IGameServer {
 	}
 
 	private Game findGameByPlayer(Player player) {
-		System.out.print("GameServer.findGameByPlayer");
+		System.out.print("GameServer.findGameByPlayer - in: "+player);
 		for (Map.Entry<Player, Game> e : games.entrySet()) {
 			if (e.getValue().playerIn(player)) {
+				System.out.print("GameServer.findGameByPlayer - out: "+e.getValue());
 				return e.getValue();
 			}
 		}
+		System.out.print("GameServer.findGameByPlayer - out: GAME NOT FOUND!");
 		return null;
 	}
 
 	public Player findPlayerByName(String playerName) {
 		System.out.print("GameServer.findPlayerByName: " + playerName);
-		return players.stream().filter(it -> it.getName().equals(playerName)).findFirst().orElse(null);
-//				          .orElseThrow(() -> { return new UnknownPlayerException(name); } );
+		Optional<Player> player = players.stream().filter(it -> it.getName().equals(playerName)).findFirst();
+		if (player.isPresent()) {
+			return player.get();
+		} else {
+			return null;
+		}
 	}
 
 	private void listPlayers() {
@@ -147,6 +158,10 @@ public class GameServer implements IGameServer {
 		game.updateWord(word);
 		server.wordUpdated(game.getGuessPlayer());
 		return game;
+	}
+	
+	public List<Game> getListOfGames() {
+		return games.entrySet().stream().map( e -> e.getValue() ).collect(Collectors.toList());
 	}
 
 }

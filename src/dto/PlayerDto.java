@@ -15,11 +15,11 @@ public class PlayerDto implements Serializable {
 	private long points = 0;
 	private long countWins = 0;
 	private long countLosts = 0;
-	private PlayerStatus status;
+	private String status;
 	
 	public PlayerDto() { }
 	
-	public PlayerDto(String name, long points, long countWins, long countLosts,  PlayerStatus statuss) {
+	public PlayerDto(String name, long points, long countWins, long countLosts,  String statuss) {
 		this.name=name;
 		this.points=points;
 		this.countWins=countWins;
@@ -52,14 +52,13 @@ public class PlayerDto implements Serializable {
 		this.countLosts = countLosts;
 	}
 
-	public PlayerStatus getStatus() {
+	public String getStatus() {
 		return status;
 	}
-
-	public void setStatus(PlayerStatus status) {
+	
+	public void setStatus(String status) {
 		this.status = status;
 	}
-
 
 	@Override
 	public String toString() {

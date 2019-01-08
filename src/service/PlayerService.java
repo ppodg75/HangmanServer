@@ -31,13 +31,13 @@ public class PlayerService implements IPlayerService {
 	}
 
 	private PlayerDto mapToPlayerDto(Player player) {
-		System.out.print("PlayerService.mapToPlayerDto");
+//		System.out.print("PlayerService.mapToPlayerDto");
 		PlayerDto dto = new PlayerDto();
 		dto.setName(player.getName());
 		dto.setCountLosts(player.getCountLosts());
 		dto.setCountWins(player.getCountWins());
 		dto.setPoints(player.getPoints());
-		dto.setStatus(player.getStatus());
+		dto.setStatus(player.getStatus().name());
 		return dto;
 	}
 

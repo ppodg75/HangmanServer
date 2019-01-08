@@ -50,14 +50,25 @@ public class AppServer implements IAppServer {
 	public void sendMessageToClient(Player player, String operation, String data) {
 		clientWs.sendToPlayer(player.getName(), operation + CMD_SEP + data);
 	}
+	
+	public void sendMessageToClient(Player player, String operation) {
+		System.out.println("sendMessageToClient "+player.getName()+" > "+operation);
+		clientWs.sendToPlayer(player.getName(), operation);
+	}
+
 
 	public void sendLetter(Player toPlayer, String letter) {
 		sendMessageToClient(toPlayer, Command.CMD_LETTER.toString(), letter);
 	}
 
 	public void sendMessageOpponentDisconnected(Player toPlayer, String disconnectedPlayerName) {
-		sendMessageToClient(toPlayer, Command.CMD_DISCONNECTED.toString(), disconnectedPlayerName);
+		sendMessageToClient(toPlayer, Command.CMD_DISCONNECTED.toString(), disconnectedPlayerName);	
 	}
+	
+	public void sendGoToPage(Player toPlayer, String page) {
+		sendMessageToClient(toPlayer, Command.CMD_GOTO_PAGE.toString()+"_" + page);	
+	}
+	
 	
 	public void wordUpdated(Player toPlayer) {
 		sendMessageToClient(toPlayer, Command.CMD_WORD_UPDATED.toString(), "");

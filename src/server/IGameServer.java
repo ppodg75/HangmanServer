@@ -17,5 +17,6 @@ public interface IGameServer {
 	Game updateGappedWordLetter(Player player, String letter);
 	Game getGameByPlayerName(String palyerName);
 	Game updateWord(Player player, String word);
+	List<Game> getListOfGames();
 	
 }
