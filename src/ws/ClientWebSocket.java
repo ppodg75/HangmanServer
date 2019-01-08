@@ -25,6 +25,7 @@ public class ClientWebSocket implements IClientWebSocket {
 	private static final String OPERATION_HELLO = "hello";
 	private static final String OPERATION_BYEBYE = "byebye";
 
+	// Opis
 	@Inject
 	private IAppServer server;
 
