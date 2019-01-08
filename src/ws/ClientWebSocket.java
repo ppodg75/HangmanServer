@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -24,6 +23,7 @@ import server.IAppServer;
 public class ClientWebSocket implements IClientWebSocket {
 
 	private static final String OPERATION_HELLO = "hello";
+	private static final String OPERATION_BYEBYE = "byebye";
 
 	@Inject
 	private IAppServer server;
@@ -54,7 +54,10 @@ public class ClientWebSocket implements IClientWebSocket {
 			System.out.println("Server is NULL");
 		} else {
 			System.out.println("WS:Forwarding message to app server");
-
+			
+			if (isMessageByeBye(message)) {
+				removePlayerSession(message, session);
+			} else
 			if (isMessageHello(message)) {
 				updatePlayerSession(message, session);
 			} else {
@@ -75,10 +78,23 @@ public class ClientWebSocket implements IClientWebSocket {
 		return OPERATION_HELLO.equals(getOperationFromMessage(message));
 	}
 
+	private boolean isMessageByeBye(String message) {		
+		return OPERATION_BYEBYE.equals(getOperationFromMessage(message));
+	}
+	
 	private void updatePlayerSession(String message, Session session) {
 		System.out.println("WS:updatePlayerSession " + message+ " > session: "+session.getId());
 		String playerName = getDataFromMessage(message);
 		playersSessions.put(playerName, session);
+		synchronizeSessionPlayers();
+	}
+	
+	private void removePlayerSession(String message, Session session) {
+		System.out.println("removePlayerSession " + message+ " > session: "+session.getId());
+		String playerName = getDataFromMessage(message);
+		playersSessions.remove(playerName);
+		peers.remove(session);
+		server.removePlayerByName(playerName);
 		synchronizeSessionPlayers();
 	}
 

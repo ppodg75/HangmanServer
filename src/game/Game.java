@@ -1,119 +1,154 @@
 package game;
 
-import java.util.regex.Pattern;
-
 public class Game {
 	
-	private Player[] players = new Player[2];	
+	private static final int MAX_MISSED_LETTERS = 8;
+
+	private Player[] players = new Player[2];
+	private Player theWinner = null;
 	private int wordPlayer = 0;
-	private String theWord;
-	private String gappedWord;
+	private String theWord;	
 	private long countUniqueLetters = 0;
-	private int countHit = 0;
 	private int countMissed = 0;
 	private String usedLetters;
 	private int maxMissedLetters;
-	private GameStatus gameStatus = GameStatus.INIT;
+	private GameStatus gameStatus = GameStatus.CREATED;
+
+	public Game() {
+	}
+
+	public String getTheWord() {
+		return theWord;
+	}
+
+	public int getCountMissed() {
+		return countMissed;
+	}
+
+	public String getUsedLetters() {
+		return usedLetters;
+	}
+
+	public GameStatus getGameStatus() {
+		return gameStatus;
+	}
 	
-	public Game(Player player1, Player player2) {
-		players[0] = player1;
-		players[1] = player2;
+	public void setWordPlayer(Player player) {
+		players[wordPlayer] = player;
+	}
+	
+	public void setGuessPlayer(Player player) {
+		players[1 - wordPlayer] = player;
 	}	
 
 	public Player getWordPlayer() {
 		return players[wordPlayer];
 	}
-	
+
 	public Player getGuessPlayer() {
-		return players[1-wordPlayer];
+		return players[1 - wordPlayer];
 	}
 	
-	public void Start(String theWord, Player wordPlayer, int maxMissedLetters) {
-		this.theWord = theWord.toUpperCase();
-		this.wordPlayer = (wordPlayer == players[0])?0:1;
-		this.maxMissedLetters = maxMissedLetters;
-		init();
+	public Player getWinner() {
+		return theWinner;
 	}
-	
-	private void init() {
-		countHit = 0;
-		countMissed = 0;
-		countUniqueLetters = countUniqueCharacters(theWord);
-		gappedWord = gappedWord(theWord);
-	}
-	
-	public static long countUniqueCharacters(String input) {
-	   return input.chars().distinct().count();
-	}
-	
-	public static String gappedWord(String w) {
-		Pattern p = Pattern.compile(".",   Pattern.DOTALL );
-	    return p.matcher(w).replaceAll("_");
-	}	
-	
-	public boolean letterHasBeenUsed(Character letter) {
-		return usedLetters.chars().anyMatch(letter::equals);
-	}
-	
-	public boolean letterHit(Character letter) {
-		return theWord.chars().anyMatch(letter::equals);
-	}
-	
-	public boolean wordGuessed() {
-		return gappedWord.equals(theWord);
-	}
-	
-	public boolean missesReachMaximum() {
-		return countMissed==maxMissedLetters;
-	}	
-	
-	public LetterGuessResult tryLetter(Character letter) {		
-		if (letterHasBeenUsed(letter)) {
-			return LetterGuessResult.LETTER_USED;
+		
+	public void init(boolean replay) {
+		if (!getWordPlayer().isComputer()) {
+			if (replay) { wordPlayer = 1 - wordPlayer; }
+			theWord = "";
+			gameStatus = GameStatus.WAIT_FOR_WORD;
 		} else {
+			theWord = WordGenerator.getNewWord();
+			gameStatus = GameStatus.PLAY;
+		}	
+		theWinner = null;
+		getWordPlayer().setStatus(PlayerStatus.PLAYING);
+		getGuessPlayer().setStatus(PlayerStatus.PLAYING);
+	}
+
+	public void updateWord(String theWord) {
+		this.theWord = theWord.toUpperCase();	
+		initCounters();
+	}
+
+	private void initCounters() {
+		maxMissedLetters = MAX_MISSED_LETTERS;
+		countMissed = 0;
+		usedLetters = "";
+		countUniqueLetters = countUniqueCharacters(theWord);		
+	}
+
+	public long countUniqueCharacters(String input) {
+		return input.chars().distinct().count();
+	}
+
+	public String getGappedWord() {
+		if (theWord == null || theWord.isEmpty()) {
+			return "";
+		}
+		StringBuilder gappedWord = new StringBuilder();
+		theWord.chars().forEach( wordChar -> {
+			  if (letterHasBeenUsed(wordChar)) {
+				  gappedWord.append(wordChar); 
+			  } else {
+				  gappedWord.append('_');
+			  }  
+		});
+		return gappedWord.toString();
+	}
+
+	public boolean letterHasBeenUsed(int letter) {
+		return usedLetters.chars().anyMatch(c -> c==letter);
+	}
+
+	public boolean letterHit(int letter) {
+		return theWord.chars().anyMatch( c -> letter==c );
+	}
+
+	public boolean wordGuessed() {
+		return getGappedWord().equals(theWord);
+	}
+
+	public boolean missesReachMaximum() {
+		return countMissed == maxMissedLetters;
+	}
+
+	public void tryLetter(Character letter) {
+		if (!letterHasBeenUsed(letter)) {
 			usedLetters = new StringBuilder().append(usedLetters).append(letter).toString();
-			if (letterHit(letter)) {
-				countHit++;
+			if (letterHit(letter)) {				
 				if (wordGuessed()) {
 					getGuessPlayer().addPoints(countUniqueLetters);
-					gameStatus = GameStatus.WIN;
+					getGuessPlayer().incWin();
+					getWordPlayer().incLost();
+					theWinner = getGuessPlayer();
+					gameStatus = GameStatus.END;
 				}
-				return LetterGuessResult.LETTER_HIT;
 			} else {
 				countMissed++;
 				if (missesReachMaximum()) {
 					getWordPlayer().addPoints(1);
-					gameStatus = GameStatus.LOST;
+					getGuessPlayer().incLost();
+					getWordPlayer().incWin();
+					theWinner = getWordPlayer();
+					gameStatus = GameStatus.END;
 				}
-				return LetterGuessResult.LETTER_MISSED;
-			}				
+			}
 		}
 	}
-	
-	public GuessResult guess(Character letter) {
-		LetterGuessResult result = tryLetter(letter);
-		if (GameStatus.LOST == gameStatus) {
-			getGuessPlayer().incLost();
-		}
-		if (GameStatus.WIN == gameStatus) {
-			getGuessPlayer().incLost();
-		}		
-		GuessResult.Builder builder = GuessResult
-										.builder()
-										.letterGuessResult(result)
-										.countMissed(countMissed)
-										.countHit(countHit)
-										.gameStatus(gameStatus)
-										.gappedWord(gappedWord)
-										;
 
-		return builder.build();
+	public Game guessLetter(String letter) {
+		if (!letter.isEmpty()) {
+			tryLetter(letter.charAt(0));
+		}
+		return this;
 	}
-	
+
 	public boolean playerIn(Player player) {
 		return players[0] == player || players[1] == player;
-	}	
-	
+	}
+
 	public Player getOpponent(Player player) {
 		if (players[0] == player) {
 			return players[1];
@@ -122,6 +157,10 @@ public class Game {
 		} else {
 			return null;
 		}
-			
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("Game: wordPlayerName=%s, guessPlayerName=%s", getWordPlayer(), getGuessPlayer());
 	}
 }

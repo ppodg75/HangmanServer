@@ -3,11 +3,10 @@ package server;
 public enum Command {
 	
 	CMD_HELLO("hello")	
-	, CMD_LETTER("letter")
-	, CMD_ENDGAME("end")
-	, CMD_MESSAGE("msg")
+	, CMD_LETTER("letter")	
 	, CMD_DISCONNECTED("disconnected")
 	, CMD_REFERSH_PLAYERS("refresh_player_list")
+	, CMD_WORD_UPDATED("word_updated")
 	, CMD_UNKNOWN("");
 	
 	String cmd;

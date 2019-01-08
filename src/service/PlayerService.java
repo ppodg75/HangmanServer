@@ -1,5 +1,7 @@
 package service;
 
+import static dto.GameDto.of;
+
 import static java.util.Optional.ofNullable;
 
 import java.util.List;
@@ -8,13 +10,17 @@ import java.util.stream.Collectors;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
+import dto.GameDto;
 import dto.PlayerDto;
 import exception.EmptyNameForPlayerException;
+import game.Game;
 import game.Player;
 import server.IGameServer;
 
 @ApplicationScoped
 public class PlayerService implements IPlayerService {
+	
+	private final static String COMPUTER_PLAYER_NAME = "COMPUTER";
 
 	@Inject	
 	private IGameServer gameServer;
@@ -40,9 +46,9 @@ public class PlayerService implements IPlayerService {
 		return "PlayerService - test ok";
 	}
 
-	public PlayerDto getPlayer(String user) {
-		System.out.print("PlayerService.getPlayer: "+user);
-		return ofNullable(gameServer.findPlayerByName(user)).map(this::mapToPlayerDto).orElse(null);
+	public PlayerDto getPlayer(String userName) {
+		System.out.print("PlayerService.getPlayer: "+userName);
+		return ofNullable(gameServer.findPlayerByName(userName)).map(this::mapToPlayerDto).orElse(null);
 	};
 
 	public PlayerDto createPlayer(String userName) {
@@ -58,5 +64,47 @@ public class PlayerService implements IPlayerService {
 		gameServer.addPlayer(player);
 		return mapToPlayerDto(player);
 	}
+	
+	public PlayerDto removePlayer(String userName) {
+		System.out.print("PlayerService.removePlayer: "+userName);
+		if (userName.isEmpty()) {
+			throw new EmptyNameForPlayerException();
+		}
+		Player player = gameServer.findPlayerByName(userName); 
+		if (player==null) {
+			return null;
+		} else {
+			gameServer.removePlayer(player);
+			return mapToPlayerDto(player);
+		}
+	}
+	
+	public Game createGame(String userName, String opponentName) {
+		System.out.print("PlayerService.createGame: "+userName+" vs " + opponentName);
+		Player player = gameServer.findPlayerByName(userName); 
+		Player opponent = gameServer.findPlayerByName(opponentName);	
+		System.out.println("PlayerService.createGame > player ="+player);
+		System.out.println("PlayerService.createGame > opponent ="+opponent);		
+		if (COMPUTER_PLAYER_NAME.equals(opponentName)) {
+  		  return gameServer.createGame(player);	
+		} else {
+		  return gameServer.createGame(player, opponent);
+		}
+	}
+	
+	public GameDto updateGappedWordLetter(String userName, String letter) {
+		Player player = gameServer.findPlayerByName(userName); 
+		return of(gameServer.updateGappedWordLetter(player, letter));
+	}
+	
+	public GameDto updateWord(String userName, String word) {
+		Player player = gameServer.findPlayerByName(userName); 
+		return of(gameServer.updateGappedWordLetter(player, word));
+	}
+	
+	public GameDto getGame(String userName) {
+		return GameDto.of( gameServer.getGameByPlayerName(userName) );
+	}
+	
 	
 }

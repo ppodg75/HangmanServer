@@ -2,6 +2,6 @@ package game;
 
 public enum GameStatus {
 
-	INIT, START, PLAY, WIN, LOST;
+	CREATED, WAIT_FOR_WORD, PLAY, END;
 	 
 }

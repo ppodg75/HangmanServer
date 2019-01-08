@@ -8,11 +8,14 @@ import game.Player;
 
 public interface IAppServer {
 
-//	List<Player> getPlayers();
-//	void removePlayerByName(String playerName);	
+
+	void removePlayerByName(String playerName);	
 	void messageReceived(String playerName, String message);
-//	Player findUserByName(String user);	
-//	void createPlayer(String userName);
+
 	void sendMessageOpponentDisconnected(Player opponent, String palyerName);
+	
+	void wordUpdated(Player playerName);	
+	void sendLetter(Player playerNamer, String letter);
+	void sendRefreshListPlayersToAll();
 	
 }

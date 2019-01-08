@@ -1,5 +1,7 @@
 package game;
 
+import java.util.Random;
+
 public class Player {
 	
 	private String name;
@@ -7,11 +9,21 @@ public class Player {
 	private long countWins = 0;
 	private long countLosts = 0;	
 	private PlayerStatus status = PlayerStatus.CREATED;
+	private boolean isComputer = false;
 
 	public Player(String name) {
       System.out.println("Player '"+name+"' created");
-      this.name = name;   
-
+      this.name = name;      
+	}
+	
+	public static String createRandomName() {
+		return "VirtualPlayer"+(10000000+(new Random()).nextInt(10000000));
+	}
+	
+	public static Player createComputerPlayer() {
+		Player player = new Player(createRandomName());
+		player.isComputer = true;
+		return player;
 	}
 	
 	public long addPoints(long countUniqueLetters) {
@@ -54,10 +66,14 @@ public class Player {
 
 	public void setStatus(PlayerStatus status) {
 		this.status = status;
-	}
+	}	
 	
+	public boolean isComputer() {
+		return isComputer;
+	}
+
 	@Override
 	public String toString() {
-		return "Player: Name="+name;
+		return String.format("Player: %s, points: %d, wins: %d, losts: %d, is_computer: %d",name,points,countWins,countLosts, isComputer?1:0 );
 	}
 }

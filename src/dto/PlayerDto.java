@@ -19,7 +19,7 @@ public class PlayerDto implements Serializable {
 	
 	public PlayerDto() { }
 	
-	public PlayerDto(String name, long points, long countWins, long countLosts,  PlayerStatus status) {
+	public PlayerDto(String name, long points, long countWins, long countLosts,  PlayerStatus statuss) {
 		this.name=name;
 		this.points=points;
 		this.countWins=countWins;
