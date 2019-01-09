@@ -3,7 +3,7 @@ package game;
 import java.util.Optional;
 
 public class Game {
-	
+		
 	private static final int MAX_MISSED_LETTERS = 8;
 
 	private Player[] players = new Player[2];
@@ -16,7 +16,7 @@ public class Game {
 	private int maxMissedLetters;
 	private GameStatus gameStatus = GameStatus.CREATED;
 
-	public Game() {
+	public Game() {		
 	}
 
 	public String getTheWord() {
@@ -60,6 +60,7 @@ public class Game {
 	}
 		
 	public void init(boolean replay) {
+		System.out.println("Server.Game.init: "+replay);
 		if (!getWordPlayer().isComputer()) {
 			if (replay) { wordPlayer = 1 - wordPlayer; }
 			theWord = "";
@@ -68,6 +69,8 @@ public class Game {
 			updateWord( WordGenerator.getNewWord() );
 		}	
 		theWinner = null;
+		countMissed = 0;
+		usedLetters = "";		
 		getWordPlayer().setStatus(PlayerStatus.PLAYING);
 		getGuessPlayer().setStatus(PlayerStatus.PLAYING);
 	}
@@ -81,13 +84,15 @@ public class Game {
 
 	private void initCounters() {
 		maxMissedLetters = MAX_MISSED_LETTERS;
-		countMissed = 0;
-		usedLetters = "";
 		countUniqueLetters = countUniqueCharacters(theWord);		
 	}
 
 	public long countUniqueCharacters(String input) {
 		return input.chars().distinct().count();
+	}
+	
+	public boolean letterHit(char letter) {
+		return theWord.chars().anyMatch( c -> letter==c );
 	}
 
 	public String getGappedWord() {
@@ -95,22 +100,15 @@ public class Game {
 			return "";
 		}
 		StringBuilder gappedWord = new StringBuilder();
-		theWord.chars().forEach( wordChar -> {
+		for(int i=0; i<theWord.length(); i++) {
+			  char wordChar = theWord.charAt(i);
 			  if (letterHasBeenUsed(wordChar)) {
-				  gappedWord.append(wordChar); 
+				  gappedWord.append(String.valueOf(wordChar)); 
 			  } else {
 				  gappedWord.append('_');
 			  }  
-		});
+		}
 		return gappedWord.toString();
-	}
-
-	public boolean letterHasBeenUsed(int letter) {
-		return usedLetters.chars().anyMatch(c -> c==letter);
-	}
-
-	public boolean letterHit(int letter) {
-		return theWord.chars().anyMatch( c -> letter==c );
 	}
 
 	public boolean wordGuessed() {
@@ -120,8 +118,12 @@ public class Game {
 	public boolean missesReachMaximum() {
 		return countMissed == maxMissedLetters;
 	}
+	
+	public boolean letterHasBeenUsed(char letter) {
+		return usedLetters.chars().anyMatch(c -> c==letter);
+	}
 
-	public void tryLetter(Character letter) {
+	public void tryLetter(char letter) {
 		if (!letterHasBeenUsed(letter)) {
 			usedLetters = new StringBuilder().append(usedLetters).append(letter).toString();
 			if (letterHit(letter)) {				
@@ -135,7 +137,7 @@ public class Game {
 			} else {
 				countMissed++;
 				if (missesReachMaximum()) {
-					getWordPlayer().addPoints(1);
+					getWordPlayer().addPoints(countUniqueLetters);
 					getGuessPlayer().incLost();
 					getWordPlayer().incWin();
 					theWinner = getWordPlayer();

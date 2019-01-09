@@ -17,12 +17,14 @@ import game.Game;
 import game.GameStatus;
 import game.Player;
 import game.PlayerStatus;
+import utils.WordCodeDecode;
 
 @ApplicationScoped
 public class GameServer implements IGameServer {
 
 	private List<Player> players = new ArrayList<>();
 	private Random random = new Random();
+	private final static String specChars = "¥ÆÊ£ÑÓŒ¯";
 
 	@Inject
 	private IAppServer server;
@@ -44,16 +46,14 @@ public class GameServer implements IGameServer {
 
 	private Game makeGame(Player player, Player opponent, boolean randomRole) {
 		System.out.print("GameServer.makeGame: ");
-		Game game = Optional.ofNullable(findGameByPlayers(player, opponent)).orElseGet(Game::new);
-		String opponentPage = "word";
+		Game game = Optional.ofNullable(findGameByPlayers(player, opponent)).orElseGet(Game::new);		
 		if (game.getGameStatus() == GameStatus.END) {
 			game.init(true);
 		} else {
 			int r = randomRole ? random.nextInt(100) : 0;
 			if (r > 500) { // !!!!!!!!!!!!!!!!!!!!!!!!!!!
 				game.setWordPlayer(player);
-				game.setGuessPlayer(opponent);
-				opponentPage = "guess";
+				game.setGuessPlayer(opponent);		
 			} else {
 				game.setWordPlayer(opponent);
 				game.setGuessPlayer(player);
@@ -62,6 +62,7 @@ public class GameServer implements IGameServer {
 		}
 		System.out.print("GameServer.makeGame:game= " + game);
 		games.put(player, game);
+		String opponentPage = game.getWordPlayer()==opponent? "word":"guess";
 		server.sendGoToPage(opponent, opponentPage);
 		listPlayers();
 		return game;
@@ -139,23 +140,33 @@ public class GameServer implements IGameServer {
 		player.setStatus(PlayerStatus.INVISIBLE);
 		return player;
 	}
+	
+	private String decode(String word) {	
+		String result = new String(word);
+		for(int i=0; i < specChars.length(); i++ ) {
+			result = result.replace("#"+i+";", specChars.substring(i,i+1)); 
+		}
+		return result;
+	}
 
 	public Game updateGappedWordLetter(Player player, String letter) {
 		Game game = findGameByPlayer(player);
-		game.guessLetter(letter);
+		String decodedLetter = WordCodeDecode.decodeWordWithSpecsToPolishWord(letter);		
+		game.guessLetter(decodedLetter);
 		if (!game.getWordPlayer().isComputer()) {
-			server.sendLetter(game.getWordPlayer(), letter);
+			server.sendLetter(game.getWordPlayer(), decodedLetter);
 		}
 		return game;
 	}
 
 	public Game getGameByPlayerName(String playerName) {
-		return findGameByPlayer(findPlayerByName(playerName));
-	}
+		return findGameByPlayer(findPlayerByName(playerName));	
+	}	
+
 
 	public Game updateWord(Player player, String word) {
 		Game game = findGameByPlayer(player);
-		game.updateWord(word);
+		game.updateWord(WordCodeDecode.decodeWordWithSpecsToPolishWord(word));
 		server.wordUpdated(game.getGuessPlayer());
 		return game;
 	}

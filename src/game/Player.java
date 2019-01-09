@@ -32,10 +32,12 @@ public class Player {
 	}
 	
 	public long incWin() {
+		status = PlayerStatus.CREATED;
 		return ++countWins;
 	}
 	
 	public long incLost() {
+		status = PlayerStatus.CREATED;
 		return ++countLosts;
 	}
 
