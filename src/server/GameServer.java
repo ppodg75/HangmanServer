@@ -44,7 +44,6 @@ public class GameServer implements IGameServer {
 		return game;
 	}
 
-
 	private Game makeGame(Player player, Player opponent, boolean randomRole) {
 		System.out.print("GameServer.makeGame: ");
 		Game game = Optional.ofNullable(findGameByPlayers(player, opponent)).orElseGet(Game::new);		
