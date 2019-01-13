@@ -1,10 +1,16 @@
 package game;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+
+import utils.WordGenerator;
 
 public class Game {
 		
 	private static final int MAX_MISSED_LETTERS = 8;
+	private static final WordGenerator wordGenerator = new WordGenerator();
+	private long gameId = 0;
+	private static long seqGameId = 0;
 
 	private Player[] players = new Player[2];
 	private Player theWinner = null;
@@ -15,8 +21,17 @@ public class Game {
 	private String usedLetters;
 	private int maxMissedLetters;
 	private GameStatus gameStatus = GameStatus.CREATED;
+	private LocalDateTime lastActivity;
 
-	public Game() {		
+	public Game() {
+		gameId = ++seqGameId;
+		updateLastActivity();
+	}
+	
+	private void updateLastActivity() {
+		lastActivity = LocalDateTime.now();
+		if (players[0]!=null) { players[0].updateLastActivity(); }
+		if (players[1]!=null) { players[1].updateLastActivity(); }
 	}
 
 	public String getTheWord() {
@@ -58,7 +73,15 @@ public class Game {
 	public String getWinnerName() {
 		return Optional.ofNullable(theWinner).orElse( new Player("") ).getName();
 	}
-		
+				
+	public long getGameId() {
+		return gameId;
+	}
+
+	public LocalDateTime getLastActivity() {
+		return lastActivity;
+	}
+
 	public void init(boolean replay) {
 		System.out.println("Server.Game.init: "+replay);
 		if (!getWordPlayer().isComputer()) {
@@ -66,13 +89,14 @@ public class Game {
 			theWord = "";
 			gameStatus = GameStatus.WAIT_FOR_WORD;
 		} else {
-			updateWord( WordGenerator.getNewWord() );
+			updateWord( wordGenerator.getNewWord() );
 		}	
 		theWinner = null;
 		countMissed = 0;
 		usedLetters = "";		
 		getWordPlayer().setStatus(PlayerStatus.PLAYING);
 		getGuessPlayer().setStatus(PlayerStatus.PLAYING);
+		updateLastActivity(); 
 	}
 
 	public void updateWord(String theWord) {
@@ -80,6 +104,7 @@ public class Game {
 		this.theWord = theWord.toUpperCase();	
 		this.gameStatus = GameStatus.PLAY;
 		initCounters();
+		updateLastActivity();
 	}
 
 	private void initCounters() {
@@ -107,7 +132,7 @@ public class Game {
 			  } else {
 				  gappedWord.append('_');
 			  }  
-		}
+		}		
 		return gappedWord.toString();
 	}
 
@@ -123,31 +148,49 @@ public class Game {
 		return usedLetters.chars().anyMatch(c -> c==letter);
 	}
 
-	public void tryLetter(char letter) {
+	public void tryLetter(char letter) {		
 		if (!letterHasBeenUsed(letter)) {
 			usedLetters = new StringBuilder().append(usedLetters).append(letter).toString();
 			if (letterHit(letter)) {				
 				if (wordGuessed()) {
-					getGuessPlayer().addPoints(countUniqueLetters);
-					getGuessPlayer().incWin();
+					Player guessPlayer = getGuessPlayer(); 
+					guessPlayer.addPoints(countUniqueLetters);
+					guessPlayer.incWin();
 					getWordPlayer().incLost();
-					theWinner = getGuessPlayer();
+					theWinner = guessPlayer;
+					guessPlayer.endGame();
 					gameStatus = GameStatus.END;
 				}
 			} else {
 				countMissed++;
 				if (missesReachMaximum()) {
-					getWordPlayer().addPoints(countUniqueLetters);
+					Player wordPlayer = getWordPlayer(); 
+					wordPlayer.addPoints(countUniqueLetters);
 					getGuessPlayer().incLost();
-					getWordPlayer().incWin();
-					theWinner = getWordPlayer();
+					wordPlayer.incWin();
+					theWinner = wordPlayer;
+					wordPlayer.endGame();
 					gameStatus = GameStatus.END;
 				}
 			}
 		}
 	}
+	
+	public void endGameBeforeBecouseOfPlayer(Player player) {
+		Player guessPlayer = getGuessPlayer(); 
+		Player wordPlayer = getWordPlayer();
+		if (player == guessPlayer) {
+			wordPlayer.addPoints(1);
+		} else {
+			guessPlayer.addPoints(countUniqueLetters);
+		}
+		guessPlayer.endGame();
+		wordPlayer.endGame();
+		gameStatus = GameStatus.END;
+	}
 
 	public Game guessLetter(String letter) {
+		updateLastActivity();
 		if (!letter.isEmpty()) {
 			tryLetter(letter.charAt(0));
 		}

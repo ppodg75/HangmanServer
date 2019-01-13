@@ -12,17 +12,31 @@ public interface IPlayerService {
 	
 	PlayerDto getPlayer(String userName);
 	
+	PlayerDto getPlayer(long id);
+	
 	PlayerDto createPlayer(String userName);
 	
-	PlayerDto removePlayer(String userName);
+//	PlayerDto removePlayer(String userName);
 	
-	Game createGame(String userName, String opponentName);
+	PlayerDto removePlayer(long id);
 	
-	GameDto updateGappedWordLetter(String userName, String letter);
+//	Game createGame(String userName, String opponentName);
 	
-	GameDto updateWord(String userName, String letter);
+	Game createGame(long playerId, long opponentId);
 	
-	GameDto getGame(String userName);
+//	GameDto updateGappedWordLetter(String userName, String letter);
+	
+	GameDto updateGappedWordLetter(long playerId, String letter);
+	
+//	GameDto updateWord(String userName, String word);
+	
+	GameDto updateWord(long playerId, String word);
+	
+//	GameDto getGame(String userName);
+	
+	GameDto getGame(long playerId);
+	
+	GameDto endGame(long playerId);
 	
 	String test();
 

@@ -4,10 +4,12 @@ import game.Player;
 
 public interface IAppServer {
 
-	void removePlayerByName(String playerName);	
+	void removePlayerById(long playerId);	
 	void messageReceived(String playerName, String message);
+//	void playerDisconnected(long playerId);
 
-	void sendMessageOpponentDisconnected(Player opponent, String palyerName);
+	void sendMessagePlayerDisconnected(Player opponent);
+	void sendMessageOpponentEndGame(Player opponent);
 	void sendGoToPage(Player opponent, String page);
 	
 	void wordUpdated(Player playerName);	

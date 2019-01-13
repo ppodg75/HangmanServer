@@ -16,7 +16,9 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import jersey.repackaged.com.google.common.base.Optional;
 import server.IAppServer;
+import utils.WordCodeDecode;
 
 @ApplicationScoped
 @ServerEndpoint("/play")
@@ -42,11 +44,6 @@ public class ClientWebSocket implements IClientWebSocket {
 		peers.add(session);
 	}
 
-	@OnClose
-	public void onClose(Session session) {
-		System.out.println("WS:onClose::" + session.getId());
-		peers.remove(session);
-	}
 
 	@OnMessage
 	public void onMessage(String message, Session session) {
@@ -62,7 +59,7 @@ public class ClientWebSocket implements IClientWebSocket {
 			if (isMessageHello(message)) {
 				updatePlayerSession(message, session);
 			} else {
-				String playerName = getPlayerNameBySession(session);
+				String playerName = getPlayerIdBySession(session);
 				if (!playerName.isEmpty() ) {
 				   server.messageReceived(playerName, message);
 				}
@@ -85,20 +82,28 @@ public class ClientWebSocket implements IClientWebSocket {
 	
 	private void updatePlayerSession(String message, Session session) {
 		System.out.println("WS:updatePlayerSession " + message+ " > session: "+session.getId());
-		String playerName = getDataFromMessage(message);
-		playersSessions.put(playerName, session);
+		String playerId = getDataFromMessage(message);
+		playersSessions.put(playerId, session);
 		synchronizeSessionPlayers();
+	}
+	
+	@OnClose
+	public void onClose(Session session) {
+		System.out.println("WS:onClose::" + session.getId());
+		String playerId = getPlayerIdBySession(session);
+		playersSessions.remove(playerId);
+		peers.remove(session);
 	}
 	
 	private void removePlayerSession(String message, Session session) {
 		System.out.println("removePlayerSession " + message+ " > session: "+session.getId());
-		String playerName = getDataFromMessage(message);
-		playersSessions.remove(playerName);
+		String playerId = getDataFromMessage(message) ;
+		playersSessions.remove(playerId);
 		peers.remove(session);
-		server.removePlayerByName(playerName);
 		synchronizeSessionPlayers();
+		server.removePlayerById(Long.valueOf(playerId));	
 	}
-
+	
 	private String getOperationFromMessage(String message) {
 		String[] msgItems = message.split("#");
 		if (msgItems.length > 0) {
@@ -125,7 +130,7 @@ public class ClientWebSocket implements IClientWebSocket {
 				playerSessionsToRemove.add(entry.getKey());
 			}
 		}
-		playerSessionsToRemove.forEach(playerName -> playersSessions.remove(playerName));
+		playerSessionsToRemove.forEach(playerId -> playersSessions.remove(playerId));
 	}
 	
 	private boolean peerNotExists(Session session) {
@@ -140,10 +145,10 @@ public class ClientWebSocket implements IClientWebSocket {
 			e.printStackTrace();
 		}
 	}
-
-	public void sendToPlayer(String playerName, String msg) {
-		System.out.println("WS:sendToPlayer::" + playerName + " > " + msg);
-		Session session = getSessionByPlayerName(playerName);
+	
+	public void sendToPlayer(long playerId, String msg) {
+		System.out.println("WS:sendToPlayer::" + playerId + " > " + msg);
+		Session session = getSessionByPlayerId(String.valueOf(playerId));
 		send(session, msg);
 	}
 
@@ -154,11 +159,11 @@ public class ClientWebSocket implements IClientWebSocket {
 		});
 	}
 
-	private Session getSessionByPlayerName(String playerName) {
-		return playersSessions.get(playerName);
+	private Session getSessionByPlayerId(String playerId) {
+		return playersSessions.get(playerId);
 	}
 
-	private String getPlayerNameBySession(Session session) {
+	private String getPlayerIdBySession(Session session) {
 		System.out.println("WS:getPlayerNameBySession::" + session.getId() );
 		if (session != null) {
 			for (Map.Entry<String, Session> entry : playersSessions.entrySet()) {

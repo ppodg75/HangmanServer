@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import game.PlayerStatus;
-
 @XmlRootElement
 public class PlayerDto implements Serializable {
 	
@@ -16,10 +14,12 @@ public class PlayerDto implements Serializable {
 	private long countWins = 0;
 	private long countLosts = 0;
 	private String status;
+	private long playerId = 0;
 	
 	public PlayerDto() { }
 	
-	public PlayerDto(String name, long points, long countWins, long countLosts,  String statuss) {
+	public PlayerDto(long playerId, String name, long points, long countWins, long countLosts,  String status) {
+		this.playerId = playerId;
 		this.name=name;
 		this.points=points;
 		this.countWins=countWins;
@@ -27,6 +27,14 @@ public class PlayerDto implements Serializable {
 		this.status = status;
 	}
 	
+	public void setPlayerId(long playerId) {
+		this.playerId = playerId;
+	}
+
+	public long getPlayerId() {
+		return playerId;
+	}
+
 	public String getName() {
 		return name;
 	}

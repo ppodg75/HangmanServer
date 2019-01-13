@@ -1,3 +1,4 @@
+
 package service;
 
 import static dto.GameDto.of;
@@ -33,6 +34,7 @@ public class PlayerService implements IPlayerService {
 	private PlayerDto mapToPlayerDto(Player player) {
 //		System.out.print("PlayerService.mapToPlayerDto");
 		PlayerDto dto = new PlayerDto();
+		dto.setPlayerId(player.getPlayerId());
 		dto.setName(player.getName());
 		dto.setCountLosts(player.getCountLosts());
 		dto.setCountWins(player.getCountWins());
@@ -50,6 +52,13 @@ public class PlayerService implements IPlayerService {
 		System.out.print("PlayerService.getPlayer: "+userName);
 		return ofNullable(gameServer.findPlayerByName(userName)).map(this::mapToPlayerDto).orElse(null);
 	};
+	
+
+	public PlayerDto getPlayer(long playerId) {
+		System.out.print("PlayerService.getPlayer: "+playerId);
+		return ofNullable(gameServer.findPlayerById(playerId)).map(this::mapToPlayerDto).orElse(null);		
+	}
+	
 
 	public PlayerDto createPlayer(String userName) {
 		System.out.print("PlayerService.createPlayer: "+userName);
@@ -65,12 +74,23 @@ public class PlayerService implements IPlayerService {
 		return mapToPlayerDto(player);
 	}
 	
-	public PlayerDto removePlayer(String userName) {
-		System.out.print("PlayerService.removePlayer: "+userName);
-		if (userName.isEmpty()) {
-			throw new EmptyNameForPlayerException();
-		}
-		Player player = gameServer.findPlayerByName(userName); 
+//	public PlayerDto removePlayer(String userName) {
+//		System.out.print("PlayerService.removePlayer: "+userName);
+//		if (userName.isEmpty()) {
+//			throw new EmptyNameForPlayerException();
+//		}
+//		Player player = gameServer.findPlayerByName(userName); 
+//		if (player==null) {
+//			return null;
+//		} else {
+//			gameServer.removePlayer(player);
+//			return mapToPlayerDto(player);
+//		}
+//	}
+	
+	public PlayerDto removePlayer(long playerId) {
+		System.out.print("PlayerService.removePlayer: "+playerId);		
+		Player player = gameServer.findPlayerById(playerId); 
 		if (player==null) {
 			return null;
 		} else {
@@ -79,31 +99,70 @@ public class PlayerService implements IPlayerService {
 		}
 	}
 	
-	public Game createGame(String userName, String opponentName) {
-		System.out.print("PlayerService.createGame: "+userName+" vs " + opponentName);
-		Player player = gameServer.findPlayerByName(userName); 
-		Player opponent = gameServer.findPlayerByName(opponentName);	
+	
+//	public Game createGame(String userName, String opponentName) {
+//		System.out.print("PlayerService.createGame: "+userName+" vs " + opponentName);
+//		Player player = gameServer.findPlayerByName(userName);
+//		System.out.println("PlayerService.createGame > player ="+player);
+//		if (COMPUTER_PLAYER_NAME.equals(opponentName)) {
+//  		  return gameServer.createGame(player);	
+//		} else {
+//		  Player opponent = gameServer.findPlayerByName(opponentName);
+//		  System.out.println("PlayerService.createGame > opponent ="+opponent);	
+//		  return gameServer.createGame(player, opponent);
+//		}
+//	}
+	
+	public Game createGame(long playerId, long opponentId) {
+		System.out.print("PlayerService.createGame: "+playerId+" vs " + opponentId);
+		Player player = gameServer.findPlayerById(playerId);
 		System.out.println("PlayerService.createGame > player ="+player);
-		System.out.println("PlayerService.createGame > opponent ="+opponent);		
-		if (COMPUTER_PLAYER_NAME.equals(opponentName)) {
+		if (opponentId==0) {
   		  return gameServer.createGame(player);	
 		} else {
+		  Player opponent = gameServer.findPlayerById(opponentId);
+		  System.out.println("PlayerService.createGame > opponent ="+opponent);	
 		  return gameServer.createGame(player, opponent);
 		}
 	}
 	
-	public GameDto updateGappedWordLetter(String userName, String letter) {
-		Player player = gameServer.findPlayerByName(userName); 
+//	public GameDto updateGappedWordLetter(String userName, String letter) {
+//		Player player = gameServer.findPlayerByName(userName); 
+//		return of(gameServer.updateGappedWordLetter(player, letter));
+//	}
+	
+	public GameDto updateGappedWordLetter(long playerId, String letter) {
+		Player player = gameServer.findPlayerById(playerId); 
 		return of(gameServer.updateGappedWordLetter(player, letter));
 	}
 	
-	public GameDto updateWord(String userName, String word) {
-		Player player = gameServer.findPlayerByName(userName); 
+//	public GameDto updateWord(String userName, String word) {
+//		Player player = gameServer.findPlayerByName(userName); 
+//		return of(gameServer.updateWord(player, word));
+//	}
+	
+//	public GameDto updateWord(String userName, String word) {
+//		Player player = gameServer.findPlayerByName(userName); 
+//		return of(gameServer.updateWord(player, word));
+//	}
+	
+	public GameDto updateWord(long playerId, String word) {
+		Player player = gameServer.findPlayerById(playerId); 
 		return of(gameServer.updateWord(player, word));
 	}
-	
+		
 	public GameDto getGame(String userName) {
 		return GameDto.of( gameServer.getGameByPlayerName(userName) );
+	}
+	
+	public GameDto endGame(long playerId) {
+		return GameDto.of( gameServer.endGame(playerId) );
+	}
+
+	@Override
+	public GameDto getGame(long playerId) {
+		Player player = gameServer.findPlayerById(playerId);
+		return GameDto.of( gameServer.findGameByPlayer(player) );
 	}
 	
 	

@@ -1,10 +1,9 @@
 package dto;
 
 import java.io.Serializable;
-import java.util.Optional;
 
-import static java.util.Optional.ofNullable;
 import game.Game;
+import utils.WordCodeDecode;
 
 public class GameDto implements Serializable {
 
@@ -16,15 +15,19 @@ public class GameDto implements Serializable {
 	private String usedLetters;
 	private String gameStatus;
 	private String winner;
+	private String playerWordName;
+	private String playerGuessName;
 
 	public GameDto(String theWord, String gappedWord, int countMissed, String usedLetters, String gameStatus,
-			String winner) {
+			String winner, String playerWordName, String playerGuessName) {
 		this.theWord = theWord;
 		this.gappedWord = gappedWord;
 		this.countMissed = countMissed;
 		this.usedLetters = usedLetters;
 		this.gameStatus = gameStatus;
 		this.winner = winner;
+		this.playerWordName = playerWordName;
+		this.playerGuessName = playerGuessName;
 	}
 
 	public String getTheWord() {
@@ -75,18 +78,38 @@ public class GameDto implements Serializable {
 		this.winner = winner;
 	}
 
+	public String getPlayer1Name() {
+		return playerWordName;
+	}
+
+	public void setPlayer1Name(String player1Name) {
+		this.playerWordName = player1Name;
+	}
+
+	public String getPlayer2Name() {
+		return playerGuessName;
+	}
+
+	public void setPlayer2Name(String player2Name) {
+		this.playerGuessName = player2Name;
+	}
+
 	public static GameDto of(Game game) {
 		if (game != null) {
-			return new GameDto(game.getTheWord()
-					, game.getGappedWord()
-					, game.getCountMissed()
-					, game.getUsedLetters()
-					, game.getGameStatus().name()
-					, game.getWinnerName()
-					);
+			return new GameDto(WordCodeDecode.codePolishWordToWordWithSpecs(game.getTheWord()),
+					WordCodeDecode.codePolishWordToWordWithSpecs(game.getGappedWord()), game.getCountMissed(),
+					game.getUsedLetters(), game.getGameStatus().name(),
+					WordCodeDecode.codePolishWordToWordWithSpecs(game.getWinnerName()),
+					WordCodeDecode.codePolishWordToWordWithSpecs(game.getWordPlayer().getName()),
+					WordCodeDecode.codePolishWordToWordWithSpecs(game.getGuessPlayer().getName()));
 		} else
 			return null;
 
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("player word: %s, player guess, %s, state: %s, word: %s",playerWordName, playerGuessName, gameStatus, theWord);
 	}
 
 }

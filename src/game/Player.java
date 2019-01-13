@@ -1,21 +1,35 @@
 package game;
 
+import java.time.LocalDateTime;
 import java.util.Random;
 
 public class Player {
 	
+	private long playerId = 0;
+	private static long seqPlayerId = 0;	
 	private String name;
 	private long points = 0;
 	private long countWins = 0;
 	private long countLosts = 0;	
 	private PlayerStatus status = PlayerStatus.CREATED;
 	private boolean isComputer = false;
-
+	private LocalDateTime lastActivity;
+	
 	public Player(String name) {
-      System.out.println("Player '"+name+"' created");
-      this.name = name;      
+	  playerId = ++seqPlayerId;
+      System.out.println("Player '"+name+"' created with id="+playerId);
+      this.name = name;
+      updateLastActivity();
 	}
 	
+	public void updateLastActivity() {
+		lastActivity = LocalDateTime.now();
+	}
+		
+	public long getPlayerId() {
+		return playerId;
+	}
+
 	public static String createRandomName() {
 		return "VirtualPlayer"+(10000000+(new Random()).nextInt(10000000));
 	}
@@ -31,16 +45,18 @@ public class Player {
 		return countUniqueLetters;
 	}
 	
-	public long incWin() {
-		status = PlayerStatus.CREATED;
+	public long incWin() {		
 		return ++countWins;
 	}
 	
 	public long incLost() {
-		status = PlayerStatus.CREATED;
+		
 		return ++countLosts;
 	}
-
+	
+	public void endGame() {
+		status = PlayerStatus.CREATED;
+	}
 	
 	public String getName() {
 		return name;

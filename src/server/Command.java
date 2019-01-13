@@ -5,6 +5,7 @@ public enum Command {
 	CMD_HELLO("hello")	
 	, CMD_LETTER("letter")	
 	, CMD_DISCONNECTED("disconnected")
+	, CMD_OPPONENT_END_GAME("opponnent_end_game")
 	, CMD_REFERSH_PLAYERS("refresh_player_list")
 	, CMD_WORD_UPDATED("word_updated")
 	, CMD_GOTO_PAGE_GUESS("goto_guess")

@@ -40,6 +40,9 @@ public class AppServer implements IAppServer {
 			Command cmd = getCommand(operationData);
 			String data = getData(operationData);
 			Player player = gameServer.findPlayerByName(playerName);
+			if (player==null) {
+				System.out.print("AppServer.messageReceived: "+playerName+" > Player not FOUND!");
+			}
 			doCommand(player, cmd, data);
 		}
 	}
@@ -48,12 +51,27 @@ public class AppServer implements IAppServer {
 	}	
 
 	public void sendMessageToClient(Player player, String operation, String data) {
-		clientWs.sendToPlayer(player.getName(), operation + CMD_SEP + data);
+		if (player==null) { 
+			System.out.println("sendMessageToClient - Player NULL!");
+		}
+		System.out.println("sendMessageToClient "+player.getName()+" > "+operation+" # "+data);
+		if (player.isComputer()) {
+			System.out.println("Players is the computer (virtual player), messege has not been sent");
+			return;
+		}
+		clientWs.sendToPlayer(player.getPlayerId(), operation + CMD_SEP + data);		
 	}
 	
 	public void sendMessageToClient(Player player, String operation) {
+		if (player==null) { 
+			System.out.println("sendMessageToClient - Player NULL!");
+		}
 		System.out.println("sendMessageToClient "+player.getName()+" > "+operation);
-		clientWs.sendToPlayer(player.getName(), operation);
+		if (player.isComputer()) {
+			System.out.println("Players is the computer (virtual player), messege has not been sent");
+			return;
+		}
+		clientWs.sendToPlayer(player.getPlayerId(), operation);		
 	}
 
 
@@ -61,8 +79,12 @@ public class AppServer implements IAppServer {
 		sendMessageToClient(toPlayer, Command.CMD_LETTER.toString());
 	}
 
-	public void sendMessageOpponentDisconnected(Player toPlayer, String disconnectedPlayerName) {
-		sendMessageToClient(toPlayer, Command.CMD_DISCONNECTED.toString(), disconnectedPlayerName);	
+	public void sendMessagePlayerDisconnected(Player toPlayer) {
+		sendMessageToClient(toPlayer, Command.CMD_DISCONNECTED.toString(), "");	
+	}
+	
+	public void sendMessageOpponentEndGame(Player toPlayer) {
+		sendMessageToClient(toPlayer, Command.CMD_OPPONENT_END_GAME.toString());	
 	}
 	
 	public void sendGoToPage(Player toPlayer, String page) {
@@ -83,8 +105,14 @@ public class AppServer implements IAppServer {
 		return "Server name";
 	}
 
-	public void removePlayerByName(String playerName) {
-		gameServer.removePlayer(gameServer.findPlayerByName(playerName));
-	}	
+	public void removePlayerById(long playerId) {
+		gameServer.removePlayer(gameServer.findPlayerById(playerId));
+		sendRefreshListPlayersToAll();
+	}
+	
+//	public void playerDisconnected(long playerId) {
+//		gameServer.removePlayer(gameServer.findPlayerById(playerId));
+//		sendRefreshListPlayersToAll();
+//	}
 	
 }
