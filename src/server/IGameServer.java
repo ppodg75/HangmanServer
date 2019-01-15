@@ -21,6 +21,5 @@ public interface IGameServer {
 	Game findGameByPlayer(Player player);
 	Game updateWord(Player player, String word);
 	List<Game> getListOfGames();
-	Game endGame(long playerId); 
 	
 }

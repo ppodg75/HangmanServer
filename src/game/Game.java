@@ -86,20 +86,18 @@ public class Game {
 		return lastActivity;
 	}
 
-	public void init(boolean replay) {
-		System.out.println("Server.Game.init: " + replay);
+	public void init() {
+		System.out.println("Server.Game.init: ");
+		theWord = "";
+		theWinner = null;
+		countMissed = 0;
+		usedLetters = "";
 		if (!getWordPlayer().isComputer()) {
-			if (replay) {
-				wordPlayer = 1 - wordPlayer;
-			}
-			theWord = "";
 			gameStatus = GameStatus.WAIT_FOR_WORD;
 		} else {
 			updateWord(wordGenerator.getNewWord());
 		}
-		theWinner = null;
-		countMissed = 0;
-		usedLetters = "";
+		
 		getWordPlayer().setStatus(PlayerStatus.PLAYING);
 		getGuessPlayer().setStatus(PlayerStatus.PLAYING);
 		updateLastActivity();
@@ -159,23 +157,27 @@ public class Game {
 			usedLetters = new StringBuilder().append(usedLetters).append(letter).toString();
 			if (letterHit(letter)) {
 				if (wordGuessed()) {
+					Player wordPlayer = getWordPlayer();
 					Player guessPlayer = getGuessPlayer();
 					guessPlayer.addPoints(countUniqueLetters);
 					guessPlayer.incWin();
 					getWordPlayer().incLost();
 					theWinner = guessPlayer;
 					guessPlayer.endGame();
+					wordPlayer.endGame();
 					gameStatus = GameStatus.END;
 				}
 			} else {
 				countMissed++;
 				if (missesReachMaximum()) {
 					Player wordPlayer = getWordPlayer();
+					Player guessPlayer = getGuessPlayer();
 					wordPlayer.addPoints(countUniqueLetters);
 					getGuessPlayer().incLost();
 					wordPlayer.incWin();
 					theWinner = wordPlayer;
 					wordPlayer.endGame();
+					guessPlayer.endGame();
 					gameStatus = GameStatus.END;
 				}
 			}
@@ -217,6 +219,10 @@ public class Game {
 		} else {
 			return null;
 		}
+	}
+	
+	public boolean withComputer() {
+		return getWordPlayer().isComputer(); 
 	}
 
 	@Override

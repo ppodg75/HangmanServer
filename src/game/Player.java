@@ -5,6 +5,7 @@ import java.util.Random;
 
 public class Player {
 	
+	private static final int MAX_ECHO_SECONDS = 10;
 	private long playerId = 0;
 	private static long seqPlayerId = 0;	
 	private String name;
@@ -15,6 +16,7 @@ public class Player {
 	private boolean isComputer = false;
 	private LocalDateTime lastActivity;
 	
+	
 	public Player(String name) {
 	  playerId = ++seqPlayerId;
       System.out.println("Player '"+name+"' created with id="+playerId);
@@ -23,7 +25,12 @@ public class Player {
 	}
 	
 	public void updateLastActivity() {
+//		System.out.println("Player with id="+playerId+" updateLastActivity");
 		lastActivity = LocalDateTime.now();
+	}
+	
+	public boolean noneFeedBack() {
+		return LocalDateTime.now().minusSeconds(MAX_ECHO_SECONDS).isAfter(lastActivity);
 	}
 		
 	public long getPlayerId() {

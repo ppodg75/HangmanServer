@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response;
 import com.google.gson.Gson;
 
 import dto.PlayerDto;
+import server.IAppServer;
 import service.IPlayerService;
 
 @ApplicationScoped
@@ -52,6 +53,15 @@ public class PlayerEndpoint {
 							.map( dto -> Response.ok(dto,MediaType.TEXT_PLAIN).build() )
 							.orElse( Response.status(Response.Status.NOT_FOUND).entity("USER NOT EXIST!" ).build() )
 							;
+	}
+	
+	@GET
+	@Path("alive/{id}")
+	@Produces(MediaType.TEXT_PLAIN)
+	public String alive(@PathParam("id") long id) {
+//		System.out.println("PlayersEndpoint.alive "+id);
+		playerService.playerAlive(id);
+		return "OK";					
 	}
 	
 	@GET
@@ -91,13 +101,6 @@ public class PlayerEndpoint {
 							.orElse( Response.status(Response.Status.NOT_FOUND).entity("USER NOT EXIST!" ).build() );
 	}	
 		
-	@GET
-	@Path("test")
-	@Produces(MediaType.TEXT_PLAIN)
-	public String test() {
-		System.out.println("PlayersEndpoint.test");
-		return playerService.test();
-	}
 	
 	private String toJson(Object o) {
 		return gson.toJson(o);

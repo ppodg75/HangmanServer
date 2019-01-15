@@ -2,7 +2,6 @@
 package service;
 
 import static dto.GameDto.of;
-
 import static java.util.Optional.ofNullable;
 
 import java.util.List;
@@ -20,15 +19,20 @@ import server.IGameServer;
 
 @ApplicationScoped
 public class PlayerService implements IPlayerService {
-	
-	private final static String COMPUTER_PLAYER_NAME = "COMPUTER";
 
 	@Inject	
 	private IGameServer gameServer;
-
+	
 	public List<PlayerDto> getPlayersDto() {
 		System.out.println("PlayerService.getPlayersDto > ");
+		checkAndRemoveNoActivePlayers();	
 		return gameServer.getPlayers().stream().map(this::mapToPlayerDto).collect(Collectors.toList());
+	}
+	
+	public void checkAndRemoveNoActivePlayers() {
+		System.out.println("PlayerService.checkAndRemoveNoActivePlayers() ");		
+		List<Player> players =gameServer.getPlayers().stream().filter(Player::noneFeedBack).collect(Collectors.toList());
+		players.forEach( p -> { gameServer.removePlayer(p); });
 	}
 
 	private PlayerDto mapToPlayerDto(Player player) {
@@ -74,20 +78,6 @@ public class PlayerService implements IPlayerService {
 		return mapToPlayerDto(player);
 	}
 	
-//	public PlayerDto removePlayer(String userName) {
-//		System.out.print("PlayerService.removePlayer: "+userName);
-//		if (userName.isEmpty()) {
-//			throw new EmptyNameForPlayerException();
-//		}
-//		Player player = gameServer.findPlayerByName(userName); 
-//		if (player==null) {
-//			return null;
-//		} else {
-//			gameServer.removePlayer(player);
-//			return mapToPlayerDto(player);
-//		}
-//	}
-	
 	public PlayerDto removePlayer(long playerId) {
 		System.out.print("PlayerService.removePlayer: "+playerId);		
 		Player player = gameServer.findPlayerById(playerId); 
@@ -98,20 +88,6 @@ public class PlayerService implements IPlayerService {
 			return mapToPlayerDto(player);
 		}
 	}
-	
-	
-//	public Game createGame(String userName, String opponentName) {
-//		System.out.print("PlayerService.createGame: "+userName+" vs " + opponentName);
-//		Player player = gameServer.findPlayerByName(userName);
-//		System.out.println("PlayerService.createGame > player ="+player);
-//		if (COMPUTER_PLAYER_NAME.equals(opponentName)) {
-//  		  return gameServer.createGame(player);	
-//		} else {
-//		  Player opponent = gameServer.findPlayerByName(opponentName);
-//		  System.out.println("PlayerService.createGame > opponent ="+opponent);	
-//		  return gameServer.createGame(player, opponent);
-//		}
-//	}
 	
 	public Game createGame(long playerId, long opponentId) {
 		System.out.print("PlayerService.createGame: "+playerId+" vs " + opponentId);
@@ -126,26 +102,12 @@ public class PlayerService implements IPlayerService {
 		}
 	}
 	
-//	public GameDto updateGappedWordLetter(String userName, String letter) {
-//		Player player = gameServer.findPlayerByName(userName); 
-//		return of(gameServer.updateGappedWordLetter(player, letter));
-//	}
-	
 	public GameDto updateGappedWordLetter(long playerId, String letter) {
 		Player player = gameServer.findPlayerById(playerId); 
 		return of(gameServer.updateGappedWordLetter(player, letter));
 	}
 	
-//	public GameDto updateWord(String userName, String word) {
-//		Player player = gameServer.findPlayerByName(userName); 
-//		return of(gameServer.updateWord(player, word));
-//	}
-	
-//	public GameDto updateWord(String userName, String word) {
-//		Player player = gameServer.findPlayerByName(userName); 
-//		return of(gameServer.updateWord(player, word));
-//	}
-	
+
 	public GameDto updateWord(long playerId, String word) {
 		Player player = gameServer.findPlayerById(playerId); 
 		return of(gameServer.updateWord(player, word));
@@ -155,8 +117,13 @@ public class PlayerService implements IPlayerService {
 		return GameDto.of( gameServer.getGameByPlayerName(userName) );
 	}
 	
-	public GameDto endGame(long playerId) {
-		return GameDto.of( gameServer.endGame(playerId) );
+//	public GameDto endGame(long playerId) {
+//		return GameDto.of( gameServer.endGame(playerId) );
+//	}
+	
+	public void playerAlive(long playerId) {
+		Player player = gameServer.findPlayerById(playerId);
+		player.updateLastActivity();
 	}
 
 	@Override

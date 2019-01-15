@@ -10,6 +10,7 @@ public enum Command {
 	, CMD_WORD_UPDATED("word_updated")
 	, CMD_GOTO_PAGE_GUESS("goto_guess")
 	, CMD_GOTO_PAGE("goto")
+	, CMD_ECHO("echo")
 	, CMD_UNKNOWN("");
 	
 	String cmd;

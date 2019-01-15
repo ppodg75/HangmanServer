@@ -27,8 +27,6 @@ public class GameEndpoint {
 	
 	@Inject
 	private IGameServer gameServer;
-	
-	
 	private Gson gson;
 	
 	public GameEndpoint() {
@@ -54,19 +52,6 @@ public class GameEndpoint {
 		return "word";
 	}	
 	
-//	@GET
-//	@Path("gameByPlayerName/{userName}")
-//	@Produces(MediaType.TEXT_PLAIN)
-//	public Response getGame(@PathParam("userName") String userName) {
-//		System.out.println("GameEndpoint.getGame "+userName);		
-//		return Optional
-//				.ofNullable( playerService.getGame(userName) )
-//							.map(this::toJson)
-//							.map( json -> Response.ok(json,MediaType.TEXT_PLAIN).build() )
-//							.orElse( Response.status(Response.Status.NOT_FOUND).entity("GAME FOR USER NOT EXIST!" ).build() )
-//							;
-//	}
-	
 	@GET
 	@Path("gameByPlayerId/{playerId}")
 	@Produces(MediaType.TEXT_PLAIN)
@@ -82,19 +67,19 @@ public class GameEndpoint {
 							;
 	}
 	
-	@GET
-	@Path("endGame/{playerId}")
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response endGame(@PathParam("playerId") long playerId) {
-		System.out.println("GameEndpoint.endGame for player id = "+playerId);		
-		GameDto game = playerService.endGame(playerId);	 		
-		return Optional
-				.ofNullable(  game )
-							.map(this::toJson)
-							.map( json -> Response.ok(json,MediaType.TEXT_PLAIN).build() )
-							.orElse( Response.status(Response.Status.NOT_FOUND).entity("GAME FOR USER NOT EXIST!" ).build() )
-							;
-	}
+//	@GET
+//	@Path("endGame/{playerId}")
+//	@Produces(MediaType.TEXT_PLAIN)
+//	public Response endGame(@PathParam("playerId") long playerId) {
+//		System.out.println("GameEndpoint.endGame for player id = "+playerId);		
+//		GameDto game = playerService.endGame(playerId);	 		
+//		return Optional
+//				.ofNullable(  game )
+//							.map(this::toJson)
+//							.map( json -> Response.ok(json,MediaType.TEXT_PLAIN).build() )
+//							.orElse( Response.status(Response.Status.NOT_FOUND).entity("GAME FOR USER NOT EXIST!" ).build() )
+//							;
+//	}
 	
 	
 	@GET

@@ -26,8 +26,6 @@ public class WordCodeDecode {
 		return String.valueOf(c);
 	}
 	
-
-	
 	public static String codePolishWordToWordWithSpecs(String word) {
 		StringBuilder result = new StringBuilder();
 		for(int i=0; i < word.length(); i++ ) {
