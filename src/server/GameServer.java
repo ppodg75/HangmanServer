@@ -19,7 +19,7 @@ import game.PlayerStatus;
 import utils.WordCodeDecode;
 
 /**
- * Klasa do obs³ugi listy gier  
+ * Klasa do obsï¿½ugi listy gier  
  * @author Norbert Matrzak
  * 
  */
@@ -37,7 +37,7 @@ public class GameServer implements IGameServer {
 	private ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<>();
 
 	/**
-	 * Tworzy grê dla pary graczy 
+	 * Tworzy grï¿½ dla pary graczy 
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @param opponent - przeciwnik
@@ -51,7 +51,7 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Tworzy grê dla gracz z przypisaniem wirtualnego gracza (komputer) 
+	 * Tworzy grï¿½ dla gracz z przypisaniem wirtualnego gracza (komputer) 
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @return Game - gra
@@ -64,11 +64,11 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Tworzy grê dla pary graczy
+	 * Tworzy grï¿½ dla pary graczy
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @param opponent - przeciwnik
-	 * @param randomRole - czy ma byæ losowana rola zgaduj¹cy/wprowadzaj¹cy s³owo
+	 * @param randomRole - czy ma byï¿½ losowana rola zgadujï¿½cy/wprowadzajï¿½cy sï¿½owo
 	 * @return Game - gra
 	 * @exception  
 	 */
@@ -102,7 +102,7 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Dodaje gracza i wysy³a komunikat odœwie¿enia listy
+	 * Dodaje gracza i wysyï¿½a komunikat odï¿½wieï¿½enia listy
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @param 
@@ -117,7 +117,7 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Usuwa gracza i wysy³a komunikat odœwie¿enia listy
+	 * Usuwa gracza i wysyï¿½a komunikat odï¿½wieï¿½enia listy
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @param 
@@ -133,7 +133,7 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Realizuje akcjê roz³¹czenia-zakoñczenia gry 
+	 * Realizuje akcjï¿½ rozï¿½ï¿½czenia-zakoï¿½czenia gry 
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @return 
@@ -148,7 +148,7 @@ public class GameServer implements IGameServer {
 	}
 	
 	/**
-	 * Wyszukuje grê dla danej pary graczy,
+	 * Wyszukuje grï¿½ dla danej pary graczy,
 	 * @author Norbert Matrzak
 	 * @param player1, player2 - para graczy
 	 * @return znaleziony obiekt klasy Gracz
@@ -165,7 +165,7 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Znajduje grê dla danego gracza
+	 * Znajduje grï¿½ dla danego gracza
 	 * @author Norbert Matrzak
 	 * @param player - gracz (obiekt klasy Player)
 	 * @return znaleziony obiekt klasy Game
@@ -184,10 +184,10 @@ public class GameServer implements IGameServer {
 	}
 	
 	/**
-	 * Koñczy grê - ustawia status grze i u¿ytkownikom, ewentualnie usuwa grê z listy gier, odœwie¿a listê gier
+	 * Koï¿½czy grï¿½ - ustawia status grze i uï¿½ytkownikom, ewentualnie usuwa grï¿½ z listy gier, odï¿½wieï¿½a listï¿½ gier
 	 * @author Norbert Matrzak
 	 * @param playerName - nazwa gracza
-	 * @return znaleziony obiekt klasy Game lub null, gdy gra usuniêta
+	 * @return znaleziony obiekt klasy Game lub null, gdy gra usuniï¿½ta
 	 * @exception  
 	 */
 //	public Game endGame(long playerId) {
@@ -239,7 +239,7 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Odœwie¿a listê gier, i wysy³a sygna³ do klienta (przegl¹darki) - ¿¹danie odœwie¿enia listy graczy
+	 * Odï¿½wieï¿½a listï¿½ gier, i wysyï¿½a sygnaï¿½ do klienta (przeglï¿½darki) - ï¿½ï¿½danie odï¿½wieï¿½enia listy graczy
 	 * @author Norbert Matrzak
 	 * @param 
 	 * @return 
@@ -252,7 +252,7 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Zwraca listê graczy, na potrzeby javascript, zawsze dodawani s¹ dwaj gracze niewidoczni, tak aby JavaScrit zawsza widzia³ obiekt jako listê obiektów gracz
+	 * Zwraca listï¿½ graczy, na potrzeby javascript, zawsze dodawani sï¿½ dwaj gracze niewidoczni, tak aby JavaScrit zawsza widziaï¿½ obiekt jako listï¿½ obiektï¿½w gracz
 	 * @author Norbert Matrzak
 	 * @param 
 	 * @return lista graczy
@@ -282,10 +282,10 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Aktualizuje wybrakowane - szukane s³owo o podan¹ / wys³an¹ literê
+	 * Aktualizuje wybrakowane - szukane sï¿½owo o podanï¿½ / wysï¿½anï¿½ literï¿½
 	 * @author Norbert Matrzak
 	 * @param player - gracz
-	 * @param letter - wys³ana litera (mo¿e byæ zakodowana w przypadku polskich diaktrycznych liter)
+	 * @param letter - wysï¿½ana litera (moï¿½e byï¿½ zakodowana w przypadku polskich diaktrycznych liter)
 	 * @return gra - przypisana do gracza
 	 * @exception  
 	 */		
@@ -312,10 +312,10 @@ public class GameServer implements IGameServer {
 	}	
 
 	/**
-	 * Aktualizuje s³owo do zgadniêcie
+	 * Aktualizuje  sÅ‚owo do zgadniÄ™cie
 	 * @author Norbert Matrzak
 	 * @param player - gracz
-	 * @param letter - wys³ana litera (mo¿e byæ zakodowana w przypadku polskich diaktrycznych liter)
+	 * @param letter - wysÅ‚ana litera (moÅ¼e byÄ‡ zakodowana w przypadku polskich diaktrycznych liter)
 	 * @return gra - przypisana do gracza
 	 * @exception  
 	 */		
@@ -328,7 +328,7 @@ public class GameServer implements IGameServer {
 	}
 	
 	/**
-	 * Koñczy grê dla danego gracza i wykonuje dodatkowe czynnoœci - komunikat o zakoñczeniu gry
+	 * Koï¿½czy grï¿½ dla danego gracza i wykonuje dodatkowe czynnoï¿½ci - komunikat o zakoï¿½czeniu gry
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @param 
@@ -341,7 +341,7 @@ public class GameServer implements IGameServer {
 	}
 	
 	/**
-	 * Koñczy grê i wykonuje dodatkowe czynnoœci - wykonanie czynnoœci oraz wys³anie komunikatów
+	 * Koï¿½czy grï¿½ i wykonuje dodatkowe czynnoï¿½ci - wykonanie czynnoï¿½ci oraz wysï¿½anie komunikatï¿½w
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @param 
@@ -355,7 +355,7 @@ public class GameServer implements IGameServer {
 	}
 	
 	/**
-	 * Usuwa grê
+	 * Usuwa grï¿½
 	 * @author Norbert Matrzak
 	 * @param player - gracz
 	 * @param 
@@ -370,7 +370,7 @@ public class GameServer implements IGameServer {
 	}
 	
 	/**
-	 * Aktualizuje listê gier i zwraca j¹
+	 * Aktualizuje listï¿½ gier i zwraca jï¿½
 	 * @author Norbert Matrzak
 	 * @param 
 	 * @param 
@@ -383,7 +383,7 @@ public class GameServer implements IGameServer {
 	}
 	
 	/**
-	 * Aktualizuje listê gier - usuwa gry o czasie bezczynnoœci d³u¿szym ni¿ X sekund
+	 * Aktualizuje listï¿½ gier - usuwa gry o czasie bezczynnoï¿½ci dï¿½uï¿½szym niï¿½ X sekund
 	 * @author Norbert Matrzak
 	 * @param 
 	 * @param 
@@ -401,11 +401,11 @@ public class GameServer implements IGameServer {
 	
 	
 	/**
-	 * Sprawdza stan bezczynnœci gry
+	 * Sprawdza stan bezczynnï¿½ci gry
 	 * @author Norbert Matrzak
 	 * @param 
 	 * @param 
-	 * @return  true-je¿eli zosta³ przekroczony stan bezczynnoœci
+	 * @return  true-jeï¿½eli zostaï¿½ przekroczony stan bezczynnoï¿½ci
 	 * @exception
 	 */	
 	private boolean noActivityForLongTime(Game game) {

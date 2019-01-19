@@ -6,7 +6,7 @@ import java.util.List;
 public class WordCodeDecode {
 	
 	private final static String SEP= "@";
-	private final static String specPolishChars = "��ʣ�ӌ������󜿟";	
+	private final static String specPolishChars = "ĄĆĘŁŃÓŚŹŻąćęłńóśźż";	
 	
 	private final static List<Integer> coded = Arrays.asList(260,262,280,321,323,0,346,379,377,261,263,281,322,324,0,347,380);
 	
