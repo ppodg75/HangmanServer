@@ -13,13 +13,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import game.Game;
-import game.GameStatus;
 import game.Player;
 import game.PlayerStatus;
 import utils.WordCodeDecode;
 
 /**
- * Klasa do obsï¿½ugi listy gier  
+ * Klasa do obs³ugi listy gier
+ * 
  * @author Norbert Matrzak
  * 
  */
@@ -28,7 +28,7 @@ public class GameServer implements IGameServer {
 
 	private List<Player> players = new ArrayList<>();
 	private Random random = new Random();
-	
+
 	private final static long MINUTES_WITHOUT_ACTIVITY_TO_REMOVE_GAME = 10;
 
 	@Inject
@@ -37,12 +37,12 @@ public class GameServer implements IGameServer {
 	private ConcurrentLinkedQueue<Game> games = new ConcurrentLinkedQueue<>();
 
 	/**
-	 * Tworzy grï¿½ dla pary graczy 
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @param opponent - przeciwnik
-	 * @return Game - gra
-	 * @exception  
+	 * Tworzy grê dla pary graczy 
+	 * @author Norbert Matrzak 
+	 * @param player - gracz 
+	 * @param opponent - przeciwnik 
+	 * @return Game - gra 
+	 * @exception
 	 */
 	public Game createGame(Player player, Player opponent) {
 		System.out.print("GameServer.createGame: ");
@@ -51,64 +51,56 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Tworzy grï¿½ dla gracz z przypisaniem wirtualnego gracza (komputer) 
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @return Game - gra
-	 * @exception  
+	 * Tworzy grê dla gracz z przypisaniem wirtualnego gracza (komputer) 
+	 * @author Norbert Matrzak 
+	 * @param player - gracz 
+	 * @return Game - gra 
+	 * @exception
 	 */
 	public Game createGame(Player player) {
 		System.out.print("GameServer.createGame");
-		Game game = makeGame( player, Player.createComputerPlayer(), false);		
+		Game game = makeGame(player, Player.createComputerPlayer(), false);
 		return game;
 	}
 
 	/**
-	 * Tworzy grï¿½ dla pary graczy
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @param opponent - przeciwnik
-	 * @param randomRole - czy ma byï¿½ losowana rola zgadujï¿½cy/wprowadzajï¿½cy sï¿½owo
-	 * @return Game - gra
-	 * @exception  
+	 * Tworzy grê dla pary graczy 
+	 * @author Norbert Matrzak 
+	 * @param player - gracz 
+	 * @param opponent - przeciwnik 
+	 * @param randomRole - czy ma byæ losowana rola zgaduj¹cy/wprowadza¹cy s³owo 
+	 * @return Game - gra 
+	 * @exception
 	 */
 	private Game makeGame(Player player, Player opponent, boolean randomRole) {
 		System.out.print("GameServer.makeGame: ");
-//		Game game = Optional.ofNullable(findGameByPlayers(player, opponent)).orElseGet(Game::new);		
-//		if (game.getGameStatus() == GameStatus.END) {
-//			game.init(true);
-//		} else {
 		removeGame(player);
 		removeGame(opponent);
 		Game game = new Game();
-			removeGame(player);
-			int r = randomRole ? random.nextInt(1000) : 0;
-			if (r > 500) { 
-				game.setWordPlayer(player);
-				game.setGuessPlayer(opponent);		
-			} else {
-				game.setWordPlayer(opponent);
-				game.setGuessPlayer(player);
-			}
-			game.init();
-//		}
-		System.out.print("GameServer.makeGame:game= " + game);
+		removeGame(player);
+		int r = randomRole ? random.nextInt(1000) : 0;
+		if (r > 500) {
+			game.setWordPlayer(player);
+			game.setGuessPlayer(opponent);
+		} else {
+			game.setWordPlayer(opponent);
+			game.setGuessPlayer(player);
+		}
+		game.init();
 		refreshGames();
 		games.add(game);
-		String opponentPage = game.getWordPlayer()==opponent? "word":"guess";
-		server.sendGoToPage(opponent, opponentPage);
+		String opponentPage = game.getWordPlayer() == opponent ? "word" : "guess";
+		if (server != null) {
+			server.sendGoToPage(opponent, opponentPage);
+		}
 		listPlayers();
 		return game;
 	}
 
 	/**
-	 * Dodaje gracza i wysyï¿½a komunikat odï¿½wieï¿½enia listy
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @param 
-	 * @param 
-	 * @return 
-	 * @exception  
+	 * Dodaje gracza i wysy³a komunikat odœwie¿ listê graczy   
+	 * @author Norbert Matrzak 
+	 * @param player - gracz 
 	 */
 	public void addPlayer(Player player) {
 		System.out.print("GameServer.createPlayer " + player.getName());
@@ -117,99 +109,59 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Usuwa gracza i wysyï¿½a komunikat odï¿½wieï¿½enia listy
-	 * @author Norbert Matrzak
+	 * Usuwa gracza i wysy³a komunikat odœwie¿ listê graczy  
+	 * @author Norbert Matrzak 
 	 * @param player - gracz
-	 * @param 
-	 * @param 
-	 * @return 
-	 * @exception  
+	 * 
 	 */
 	public void removePlayer(Player player) {
 		System.out.print("GameServer.removePlayer " + player.getName());
 		players.remove(player);
-		removeGame(player);	
+		removeGame(player);
 		listPlayers();
 	}
 
 	/**
-	 * Realizuje akcjï¿½ rozï¿½ï¿½czenia-zakoï¿½czenia gry 
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @return 
-	 * @exception  
+	 * Realizuje akcjê roz³¹czenia-zakoñczenia gry 
+	 * @author Norbert Matrzak 
+	 * @param player - gracz 
+	 * @return @exception
 	 */
 	public void playerDisconnected(Player player) {
 		System.out.print("GameServer.playerDisconnected");
 		Game game = findGameByPlayer(player);
 		Player opponent = game.getOpponent(player);
-		server.sendMessagePlayerDisconnected(opponent);
-		games.remove(game);
-	}
-	
-	/**
-	 * Wyszukuje grï¿½ dla danej pary graczy,
-	 * @author Norbert Matrzak
-	 * @param player1, player2 - para graczy
-	 * @return znaleziony obiekt klasy Gracz
-	 * @exception  
-	 */
-	private Game findGameByPlayers(Player player1, Player player2) {
-		System.out.print("GameServer.findGameByPlayers: "+player1.getName()+" & "+player2.getName());
-		for (Game g : games) {
-			if (g.playerIn(player1) && g.playerIn(player2)) {
-				return g;
-			}
+		if (server != null) {
+			server.sendMessagePlayerDisconnected(opponent);
 		}
-		return null;
+		games.remove(game);
 	}
 
 	/**
-	 * Znajduje grï¿½ dla danego gracza
-	 * @author Norbert Matrzak
-	 * @param player - gracz (obiekt klasy Player)
-	 * @return znaleziony obiekt klasy Game
-	 * @exception  
+	 * Znajduje grê dla danego gracza 
+	 * @author Norbert Matrzak 
+	 * @param player - gracz (obiekt klasy Player) 
+	 * @return znaleziony obiekt klasy Game 
+	 * @exception
 	 */
 	public Game findGameByPlayer(Player player) {
-		System.out.print("GameServer.findGameByPlayer - in: "+player);
+		System.out.print("GameServer.findGameByPlayer - in: " + player);
 		for (Game g : games) {
 			if (g.playerIn(player)) {
-				System.out.print("GameServer.findGameByPlayer - out: "+g);
+				System.out.print("GameServer.findGameByPlayer - out: " + g);
 				return g;
 			}
 		}
 		System.out.print("GameServer.findGameByPlayer - out: GAME NOT FOUND!");
 		return null;
 	}
-	
+
 	/**
-	 * Koï¿½czy grï¿½ - ustawia status grze i uï¿½ytkownikom, ewentualnie usuwa grï¿½ z listy gier, odï¿½wieï¿½a listï¿½ gier
-	 * @author Norbert Matrzak
-	 * @param playerName - nazwa gracza
-	 * @return znaleziony obiekt klasy Game lub null, gdy gra usuniï¿½ta
-	 * @exception  
-	 */
-//	public Game endGame(long playerId) {
-//		Player player = findPlayerById(playerId);
-//	    Game game = findGameByPlayer(player);
-//	    Player opponent = game.getOpponent(player);
-//	    server.sendMessageOpponentEndGame(opponent);		
-//	    game.endGameBeforeBecouseOfPlayer(player);	    
-//	    if (game.withComputer()) {
-//	    	games.remove(game);
-//	    	game = null;
-//	    }
-//	    refreshGames();
-//	    return game;
-//	}
-	
-	/**
-	 * Wyszukuje gracza o podanej nazwie
-	 * @author Norbert Matrzak
-	 * @param playerName - nazwa gracza
-	 * @return znaleziony obiekt klasy Player
-	 * @exception  
+	 * Wyszukuje gracza o podanej nazwie 
+	 * @author Norbert Matrzak 
+	 * @param playerName - nazwa gracza 
+	 * @return znaleziony obiekt klasy Player 
+	 * @exception
 	 */
 	public Player findPlayerByName(String playerName) {
 		System.out.print("GameServer.findPlayerByName: " + playerName);
@@ -220,17 +172,17 @@ public class GameServer implements IGameServer {
 			return null;
 		}
 	}
-	
+
 	/**
-	 * Wyszukuje gracza o podanym id
-	 * @author Norbert Matrzak
-	 * @param id - id gracza
-	 * @return znaleziony obiekt klasy Player
-	 * @exception  
+	 * Wyszukuje gracza o podanym id 
+	 * @author Norbert Matrzak 
+	 * @param id - id gracza 
+	 * @return znaleziony obiekt klasy Player 
+	 * @exception
 	 */
 	public Player findPlayerById(long id) {
 		System.out.print("GameServer.findPlayerById: " + id);
-		Optional<Player> player = players.stream().filter(it -> it.getPlayerId()==id).findFirst();
+		Optional<Player> player = players.stream().filter(it -> it.getPlayerId() == id).findFirst();
 		if (player.isPresent()) {
 			return player.get();
 		} else {
@@ -239,41 +191,40 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Odï¿½wieï¿½a listï¿½ gier, i wysyï¿½a sygnaï¿½ do klienta (przeglï¿½darki) - ï¿½ï¿½danie odï¿½wieï¿½enia listy graczy
+	 * Oddœwie¿a listê gier, i wysy³a sygna³ do klienta (przegl¹darki) - wymuszenie oddœwie¿enia listy graczy 
 	 * @author Norbert Matrzak
-	 * @param 
-	 * @return 
-	 * @exception  
-	 */	
+	 * 
+	 */
 	private void listPlayers() {
 		System.out.print("GameServer.listPlayers");
 		refreshGames();
-		server.sendRefreshListPlayersToAll();
+		if (server != null) {
+			server.sendRefreshListPlayersToAll();
+		}
 	}
 
 	/**
-	 * Zwraca listï¿½ graczy, na potrzeby javascript, zawsze dodawani sï¿½ dwaj gracze niewidoczni, tak aby JavaScrit zawsza widziaï¿½ obiekt jako listï¿½ obiektï¿½w gracz
-	 * @author Norbert Matrzak
+	 * Zwraca listê graczy, na potrzeby javascript, zawsze dodawani s¹ dwaj
+	 * gracze niewidoczni, tak aby JavaScrit zawsza widzia³ obiekt jako listê obiektów gracz 
+	 * @author Norbert Matrzak 
 	 * @param 
-	 * @return lista graczy
-	 * @exception  
-	 */	
+	 * @return lista graczy 
+	 * @exception
+	 */
 	public List<Player> getPlayers() {
 		System.out.print("GameServer.getPlayers");
 		List<Player> pl = new ArrayList<>();
 		pl.addAll(Arrays.asList(createInvisiblePlayer("test1"), createInvisiblePlayer("test2")));
-//		players.stream().forEach( p -> System.out.println(p) );
-		players.stream().filter( p -> !p.isComputer() ).forEach( p -> pl.add(p) );
+		players.stream().filter(p -> !p.isComputer()).forEach(p -> pl.add(p));
 		return pl;
 	}
 
 	/**
-	 * Tworzy i zwraca nie widocznego gracza
-	 * @author Norbert Matrzak
-	 * @param playerName - nazwa gracza
-	 * @return gracz
-	 * @exception  
-	 */		
+	 * Tworzy i zwraca nie widocznego gracza 
+	 * @author Norbert Matrzak 
+	 * @param playerName - nazwa gracza 
+	 * @return gracz 
+	 */
 	private Player createInvisiblePlayer(String playerName) {
 //		System.out.print("GameServer.createInvisiblePlayer: " + playerName);
 		Player player = new Player(playerName);
@@ -282,18 +233,17 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Aktualizuje wybrakowane - szukane sï¿½owo o podanï¿½ / wysï¿½anï¿½ literï¿½
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @param letter - wysï¿½ana litera (moï¿½e byï¿½ zakodowana w przypadku polskich diaktrycznych liter)
-	 * @return gra - przypisana do gracza
-	 * @exception  
-	 */		
+	 * Aktualizuje wybrakowane - szukane s³owo o podan¹ / wysy³a literê 
+	 * @author Norbert Matrzak 
+	 * @param player - gracz 
+	 * @param letter - wys³ana litera (mo¿e byæ zakodowana w przypadku polskich diaktrycznych liter) 
+	 * @return gra - przypisana do gracza 
+	 */
 	public Game updateGappedWordLetter(Player player, String letter) {
 		Game game = findGameByPlayer(player);
-		String decodedLetter = WordCodeDecode.decodeWordWithSpecsToPolishWord(letter);		
+		String decodedLetter = WordCodeDecode.decodeWordWithSpecsToPolishWord(letter);
 		game.guessLetter(decodedLetter);
-		if (!game.getWordPlayer().isComputer()) {
+		if (!game.getWordPlayer().isComputer() && server != null) {
 			server.sendLetter(game.getWordPlayer(), decodedLetter);
 		}
 		refreshGames();
@@ -301,115 +251,106 @@ public class GameServer implements IGameServer {
 	}
 
 	/**
-	 * Wyszukuje zapisana gre dla gracza o podanej nazwie
-	 * @author Norbert Matrzak
-	 * @param playerName - nazwa gracza
-	 * @return znaleziony obiekt klasy Game
-	 * @exception  
+	 * Wyszukuje zapisana gre dla gracza o podanej nazwie 
+	 * @author Norbert Matrzak 
+	 * @param playerName - nazwa gracza 
+	 * @return znaleziony obiekt klasy Game 
+	 * @exception
 	 */
 	public Game getGameByPlayerName(String playerName) {
-		return findGameByPlayer(findPlayerByName(playerName));	
-	}	
+		return findGameByPlayer(findPlayerByName(playerName));
+	}
 
 	/**
-	 * Aktualizuje  sÅ‚owo do zgadniÄ™cie
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @param letter - wysÅ‚ana litera (moÅ¼e byÄ‡ zakodowana w przypadku polskich diaktrycznych liter)
-	 * @return gra - przypisana do gracza
-	 * @exception  
-	 */		
+	 * Aktualizuje s³owo do zgadniêcia 
+	 * @author Norbert Matrzak 
+	 * @param player - gracz 
+	 * @param letter - wys³ana litera (mo¿e byæ zakodowana w przypadku polskich diaktrycznych liter) 
+	 * @return gra - przypisana do gracza 
+	 */
 	public Game updateWord(Player player, String word) {
 		Game game = findGameByPlayer(player);
 		game.updateWord(WordCodeDecode.decodeWordWithSpecsToPolishWord(word));
-		server.wordUpdated(game.getGuessPlayer());
+		if (server != null) {
+			server.wordUpdated(game.getGuessPlayer());
+		}
 		refreshGames();
 		return game;
 	}
-	
+
 	/**
-	 * Koï¿½czy grï¿½ dla danego gracza i wykonuje dodatkowe czynnoï¿½ci - komunikat o zakoï¿½czeniu gry
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @param 
-	 * @return 
-	 * @exception  
+	 * Koñczy grê dla danego gracza i wykonuje dodatkowe czynnoœci - komunikat
+	 * o zakoñczeniu gry 
+	 * @author Norbert Matrzak 
+	 * @param player - gracz 
 	 */
 	public void playerEndGame(Player player) {
 		player.endGame();
-		server.sendMessageOpponentEndGame(player);
+		if (server != null) {
+			server.sendMessageOpponentEndGame(player);
+		}
 	}
-	
+
 	/**
-	 * Koï¿½czy grï¿½ i wykonuje dodatkowe czynnoï¿½ci - wykonanie czynnoï¿½ci oraz wysï¿½anie komunikatï¿½w
-	 * @author Norbert Matrzak
+	 * Koñczy grê i wykonuje dodatkowe czynnoœci - np. wys³anie komunikatów 
+	 * @author Norbert Matrzak 
 	 * @param player - gracz
-	 * @param 
-	 * @return 
-	 * @exception
 	 */
-	public void removeGame(Game game) {		
+	public void removeGame(Game game) {
 		playerEndGame(game.getGuessPlayer());
 		playerEndGame(game.getWordPlayer());
 		games.remove(game);
 	}
-	
+
 	/**
-	 * Usuwa grï¿½
-	 * @author Norbert Matrzak
-	 * @param player - gracz
-	 * @param 
-	 * @return 
-	 * @exception
-	 */	
+	 * Usuwa grê 
+	 * @author Norbert Matrzak 
+	 * @param player -gracz 
+	 * 
+	 */
 	private void removeGame(Player player) {
 		Game game = findGameByPlayer(player);
 		if (game != null) {
-		   removeGame(game);	
-		}		
+			removeGame(game);
+		}
 	}
-	
+
 	/**
-	 * Aktualizuje listï¿½ gier i zwraca jï¿½
-	 * @author Norbert Matrzak
-	 * @param 
-	 * @param 
+	 * Aktualizuje listê gier i zwraca j¹ 
+	 * @author Norbert Matrzak 
 	 * @return - lista gier 
-	 * @exception
-	 */	
+	 */
 	public List<Game> getListOfGames() {
 		refreshGames();
 		return games.stream().collect(Collectors.toList());
 	}
-	
+
 	/**
-	 * Aktualizuje listï¿½ gier - usuwa gry o czasie bezczynnoï¿½ci dï¿½uï¿½szym niï¿½ X sekund
-	 * @author Norbert Matrzak
-	 * @param 
-	 * @param 
-	 * @return  
-	 * @exception
-	 */	
+	 * Aktualizuje listê gier - usuwa gry o czasie bezczynnoœci d³u¿szym ni¿ X sekund 
+	 * @author Norbert Matrzak 
+	 * 
+	 */
 	private void refreshGames() {
 		try {
-		  List<Game> gameToRemove = games.stream().filter(this::noActivityForLongTime).collect(Collectors.toList());
-		  for(Game game : gameToRemove) { removeGame(game); } 
+			List<Game> gameToRemove = games.stream().filter(this::noActivityForLongTime).collect(Collectors.toList());
+			for (Game game : gameToRemove) {
+				removeGame(game);
+			}
 		} catch (Exception e) {
-			
+
 		}
 	}
-	
-	
+
 	/**
-	 * Sprawdza stan bezczynnï¿½ci gry
+	 * Sprawdza stan bezczynnoœci gry 
 	 * @author Norbert Matrzak
-	 * @param 
-	 * @param 
-	 * @return  true-jeï¿½eli zostaï¿½ przekroczony stan bezczynnoï¿½ci
+	 * @param game - badana gra
+	 * @return true-je¿eli zosta³ przekroczony stan bezczynnoœci 
 	 * @exception
-	 */	
+	 */
 	private boolean noActivityForLongTime(Game game) {
-		return (LocalDateTime.now().minusMinutes(MINUTES_WITHOUT_ACTIVITY_TO_REMOVE_GAME).isAfter(game.getLastActivity()));
+		return (LocalDateTime.now().minusMinutes(MINUTES_WITHOUT_ACTIVITY_TO_REMOVE_GAME)
+				.isAfter(game.getLastActivity()));
 	}
 
 }
