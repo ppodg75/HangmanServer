@@ -144,7 +144,7 @@ public class Game {
 		return getGappedWord().equals(theWord);
 	}
 
-	public boolean missesReachMaximum() {
+	private boolean missesReachMaximum() {
 		return countMissed == maxMissedLetters;
 	}
 
